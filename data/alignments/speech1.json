@@ -1,0 +1,394 @@
+{
+ "words": [
+  {
+   "word": "in",
+   "start": 0.1401,
+   "end": 0.2801
+  },
+  {
+   "word": "hell",
+   "start": 0.5002,
+   "end": 0.8804
+  },
+  {
+   "word": "how",
+   "start": 2.8413,
+   "end": 3.0213
+  },
+  {
+   "word": "then",
+   "start": 3.1014,
+   "end": 3.3415
+  },
+  {
+   "word": "am",
+   "start": 3.5616,
+   "end": 3.6616
+  },
+  {
+   "word": "i",
+   "start": 3.8617,
+   "end": 3.8817
+  },
+  {
+   "word": "mad",
+   "start": 4.0618,
+   "end": 4.7221
+  },
+  {
+   "word": "hearken",
+   "start": 5.6225,
+   "end": 6.0227
+  },
+  {
+   "word": "and",
+   "start": 6.5429,
+   "end": 6.6229
+  },
+  {
+   "word": "observe",
+   "start": 6.663,
+   "end": 7.1832
+  },
+  {
+   "word": "how",
+   "start": 7.2432,
+   "end": 7.4433
+  },
+  {
+   "word": "healthily",
+   "start": 7.6234,
+   "end": 8.2036
+  },
+  {
+   "word": "how",
+   "start": 8.7039,
+   "end": 8.8639
+  },
+  {
+   "word": "calmly",
+   "start": 9.004,
+   "end": 9.7043
+  },
+  {
+   "word": "i",
+   "start": 10.2245,
+   "end": 10.2446
+  },
+  {
+   "word": "can",
+   "start": 10.2846,
+   "end": 10.4246
+  },
+  {
+   "word": "tell",
+   "start": 10.5047,
+   "end": 10.7648
+  },
+  {
+   "word": "you",
+   "start": 10.8448,
+   "end": 10.9649
+  },
+  {
+   "word": "the",
+   "start": 11.0249,
+   "end": 11.1249
+  },
+  {
+   "word": "whole",
+   "start": 11.225,
+   "end": 11.7452
+  },
+  {
+   "word": "story",
+   "start": 11.9053,
+   "end": 12.4855
+  },
+  {
+   "word": "it",
+   "start": 14.5064,
+   "end": 14.5865
+  },
+  {
+   "word": "is",
+   "start": 14.6265,
+   "end": 14.7265
+  },
+  {
+   "word": "impossible",
+   "start": 14.7866,
+   "end": 15.4669
+  },
+  {
+   "word": "to",
+   "start": 15.5069,
+   "end": 15.5669
+  },
+  {
+   "word": "say",
+   "start": 15.667,
+   "end": 15.9271
+  },
+  {
+   "word": "how",
+   "start": 16.0671,
+   "end": 16.2672
+  },
+  {
+   "word": "the",
+   "start": 16.3673,
+   "end": 16.4873
+  },
+  {
+   "word": "idea",
+   "start": 16.8075,
+   "end": 17.1676
+  },
+  {
+   "word": "first",
+   "start": 17.3277,
+   "end": 17.6478
+  },
+  {
+   "word": "entered",
+   "start": 17.8079,
+   "end": 18.108
+  },
+  {
+   "word": "my",
+   "start": 18.2081,
+   "end": 18.3882
+  },
+  {
+   "word": "brain",
+   "start": 18.5082,
+   "end": 18.9884
+  },
+  {
+   "word": "but",
+   "start": 19.8088,
+   "end": 19.9489
+  },
+  {
+   "word": "once",
+   "start": 20.1089,
+   "end": 20.309
+  },
+  {
+   "word": "conceived",
+   "start": 20.3691,
+   "end": 21.1894
+  },
+  {
+   "word": "it",
+   "start": 21.6296,
+   "end": 21.7297
+  },
+  {
+   "word": "haunted",
+   "start": 21.8097,
+   "end": 22.2499
+  },
+  {
+   "word": "me",
+   "start": 22.3499,
+   "end": 22.43
+  },
+  {
+   "word": "day",
+   "start": 22.6701,
+   "end": 22.9102
+  },
+  {
+   "word": "and",
+   "start": 23.1303,
+   "end": 23.3104
+  },
+  {
+   "word": "night",
+   "start": 23.4104,
+   "end": 23.8106
+  },
+  {
+   "word": "object",
+   "start": 25.2912,
+   "end": 25.6714
+  },
+  {
+   "word": "there",
+   "start": 25.9715,
+   "end": 26.1316
+  },
+  {
+   "word": "was",
+   "start": 26.1316,
+   "end": 26.2717
+  },
+  {
+   "word": "none",
+   "start": 26.3717,
+   "end": 26.6919
+  },
+  {
+   "word": "passion",
+   "start": 27.3121,
+   "end": 27.7523
+  },
+  {
+   "word": "there",
+   "start": 28.3526,
+   "end": 28.4927
+  },
+  {
+   "word": "was",
+   "start": 28.5127,
+   "end": 28.6327
+  },
+  {
+   "word": "none",
+   "start": 28.7328,
+   "end": 29.0329
+  },
+  {
+   "word": "i",
+   "start": 30.2735,
+   "end": 30.2935
+  },
+  {
+   "word": "loved",
+   "start": 30.4535,
+   "end": 30.7937
+  },
+  {
+   "word": "the",
+   "start": 30.8537,
+   "end": 30.9538
+  },
+  {
+   "word": "old",
+   "start": 31.0738,
+   "end": 31.2739
+  },
+  {
+   "word": "man",
+   "start": 31.3739,
+   "end": 31.7341
+  },
+  {
+   "word": "he",
+   "start": 32.7345,
+   "end": 32.8146
+  },
+  {
+   "word": "had",
+   "start": 32.8746,
+   "end": 32.9947
+  },
+  {
+   "word": "never",
+   "start": 33.1547,
+   "end": 33.4349
+  },
+  {
+   "word": "wronged",
+   "start": 33.4749,
+   "end": 33.8751
+  },
+  {
+   "word": "me",
+   "start": 33.9751,
+   "end": 34.0351
+  },
+  {
+   "word": "he",
+   "start": 35.1156,
+   "end": 35.1956
+  },
+  {
+   "word": "had",
+   "start": 35.2557,
+   "end": 35.3957
+  },
+  {
+   "word": "never",
+   "start": 35.5358,
+   "end": 35.8159
+  },
+  {
+   "word": "given",
+   "start": 35.936,
+   "end": 36.2161
+  },
+  {
+   "word": "me",
+   "start": 36.3161,
+   "end": 36.3962
+  },
+  {
+   "word": "insult",
+   "start": 36.6163,
+   "end": 37.2165
+  },
+  {
+   "word": "for",
+   "start": 38.277,
+   "end": 38.4171
+  },
+  {
+   "word": "his",
+   "start": 38.4571,
+   "end": 38.5972
+  },
+  {
+   "word": "gold",
+   "start": 38.7172,
+   "end": 39.3575
+  },
+  {
+   "word": "i",
+   "start": 39.6376,
+   "end": 39.6576
+  },
+  {
+   "word": "had",
+   "start": 39.7577,
+   "end": 40.0178
+  },
+  {
+   "word": "no",
+   "start": 40.1578,
+   "end": 40.2579
+  },
+  {
+   "word": "desire",
+   "start": 40.458,
+   "end": 41.1583
+  },
+  {
+   "word": "i",
+   "start": 42.9591,
+   "end": 42.9791
+  },
+  {
+   "word": "think",
+   "start": 43.2392,
+   "end": 43.5193
+  },
+  {
+   "word": "it",
+   "start": 43.7995,
+   "end": 43.9395
+  },
+  {
+   "word": "was",
+   "start": 44.1196,
+   "end": 44.4197
+  },
+  {
+   "word": "his",
+   "start": 44.5798,
+   "end": 44.7999
+  }
+ ]
+}

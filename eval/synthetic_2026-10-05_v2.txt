@@ -1,0 +1,49 @@
+synthetic01__control_gain                  overall= 100.0 pred=[]
+synthetic01__control_noise                 overall= 100.0 pred=[]
+synthetic01__dragging_s1                   overall= 100.0 pred=[]
+synthetic01__dragging_s2                   overall=  85.7 pred=['dragging']
+synthetic01__dragging_s3                   overall=  69.5 pred=['dragging']
+synthetic01__dragging_s4                   overall=  59.1 pred=['dragging']
+synthetic01__long_pause_s1                 overall=  97.9 pred=['long_pause']
+synthetic01__long_pause_s2                 overall=  93.3 pred=['long_pause']
+synthetic01__long_pause_s3                 overall=  82.9 pred=['long_pause']
+synthetic01__long_pause_s4                 overall=  75.7 pred=['long_pause']
+synthetic01__mixed_0                       overall=  56.6 pred=['rushed', 'dragging', 'muffled']
+synthetic01__mixed_1                       overall=  58.0 pred=['monotone', 'long_pause', 'muffled']
+synthetic01__mixed_2                       overall=  58.6 pred=['muffled', 'dragging', 'volume_drop']
+synthetic01__mixed_3                       overall=  58.8 pred=['rushed', 'monotone', 'muffled']
+synthetic01__monotone_s1                   overall= 100.0 pred=[]
+synthetic01__monotone_s2                   overall=  85.9 pred=['monotone']
+synthetic01__monotone_s3                   overall=  78.8 pred=['monotone']
+synthetic01__monotone_s4                   overall=  69.2 pred=['monotone']
+synthetic01__muffled_s1                    overall=  87.0 pred=['muffled']
+synthetic01__muffled_s2                    overall=  79.9 pred=['muffled']
+synthetic01__muffled_s3                    overall=  70.2 pred=['muffled']
+synthetic01__muffled_s4                    overall=  60.0 pred=['muffled']
+synthetic01__rushed_s1                     overall= 100.0 pred=[]
+synthetic01__rushed_s2                     overall=  85.1 pred=['rushed']
+synthetic01__rushed_s3                     overall=  78.9 pred=['rushed']
+synthetic01__rushed_s4                     overall=  73.7 pred=['rushed']
+synthetic01__volume_drop_s1                overall= 100.0 pred=[]
+synthetic01__volume_drop_s2                overall=  79.6 pred=['volume_drop']
+synthetic01__volume_drop_s3                overall=  71.8 pred=['volume_drop']
+synthetic01__volume_drop_s4                overall=  63.1 pred=['volume_drop']
+
+Per flaw type (IoU>=0.3, type must match)
+type            recall  precision     F1
+dragging          0.83       1.00   0.91
+long_pause        1.00       1.00   1.00
+monotone          0.83       1.00   0.91
+muffled           1.00       1.00   1.00
+rushed            0.83       1.00   0.91
+volume_drop       0.80       1.00   0.89
+
+Recall by severity (1 = almost perfect ... 4 = botched)
+  severity 1: 0.33  (2/6)
+  severity 2: 1.00  (10/10)
+  severity 3: 1.00  (9/9)
+  severity 4: 1.00  (11/11)
+
+Boundary MAE (s): start=0.10991875000000007, end=0.08621875000000001, mean IoU=0.9519805143272108
+Negative controls: 0 false regions across 2 files
+Spearman(severity, overall score): {'dragging': -1.0, 'long_pause': -1.0, 'monotone': -1.0, 'muffled': -1.0, 'rushed': -1.0, 'volume_drop': -1.0}

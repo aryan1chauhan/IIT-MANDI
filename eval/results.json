@@ -1,0 +1,75 @@
+{
+ "per_type": {
+  "dragging": {
+   "recall": 0.8333333333333334,
+   "precision": 1.0,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 1,
+   "fp": 0
+  },
+  "long_pause": {
+   "recall": 1.0,
+   "precision": 1.0,
+   "f1": 1.0,
+   "tp": 5,
+   "fn": 0,
+   "fp": 0
+  },
+  "monotone": {
+   "recall": 0.8333333333333334,
+   "precision": 1.0,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 1,
+   "fp": 0
+  },
+  "muffled": {
+   "recall": 1.0,
+   "precision": 1.0,
+   "f1": 1.0,
+   "tp": 8,
+   "fn": 0,
+   "fp": 0
+  },
+  "rushed": {
+   "recall": 0.8333333333333334,
+   "precision": 1.0,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 1,
+   "fp": 0
+  },
+  "volume_drop": {
+   "recall": 0.8,
+   "precision": 1.0,
+   "f1": 0.888888888888889,
+   "tp": 4,
+   "fn": 1,
+   "fp": 0
+  }
+ },
+ "per_severity": {
+  "1": 0.3333333333333333,
+  "2": 1.0,
+  "3": 1.0,
+  "4": 1.0
+ },
+ "boundary_mae_s": {
+  "start": 0.10991875000000007,
+  "end": 0.08621875000000001,
+  "mean_iou": 0.9519805143272108
+ },
+ "controls": {
+  "files": 2,
+  "false_regions": 0
+ },
+ "score_vs_severity_spearman": {
+  "dragging": -1.0,
+  "long_pause": -1.0,
+  "monotone": -1.0,
+  "muffled": -1.0,
+  "rushed": -1.0,
+  "volume_drop": -1.0
+ }
+}

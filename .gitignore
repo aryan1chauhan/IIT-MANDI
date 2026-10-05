@@ -1,0 +1,29 @@
+# Virtual environments
+.venv/
+speechlens/.venv/
+venv/
+ENV/
+
+# Byte-compiled / optimized / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Audio files (large binary assets)
+*.wav
+*.flac
+*.mp3
+*.ogg
+*.m4a
+
+# Model weights / Hub cache
+.cache/
+checkpoints/
+*.pt
+*.pth
+*.bin
+
+# OS generated files
+.DS_Store
+Thumbs.db
