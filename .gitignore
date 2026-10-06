@@ -17,6 +17,10 @@ __pycache__/
 *.ogg
 *.m4a
 
+# Temporary control directories
+_controls_tmp/
+data/_controls_tmp/
+
 # Model weights / Hub cache
 .cache/
 checkpoints/

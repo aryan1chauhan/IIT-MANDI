@@ -1,0 +1,76 @@
+control        path       files  FP_total  files_with_FP  mean_overall
+identity       analytic       2         0              0        100.0
+identity       realigned      2         5              1         85.3
+tempo_0.9      analytic       2         0              0        100.0
+tempo_0.9      realigned      2         4              1         85.4
+tempo_1.1      analytic       2         0              0        100.0
+tempo_1.1      realigned      2         4              1         87.2
+pitch_-3       analytic       2         2              2         93.4
+pitch_-3       realigned      2         3              2         89.4
+pitch_+3       analytic       2         2              2         83.7
+pitch_+3       realigned      2         6              2         73.2
+mp3_64k        analytic       2         0              0        100.0
+mp3_64k        realigned      2         5              1         84.5
+noise_20dB     analytic       2         0              0        100.0
+noise_20dB     realigned      2         2              1         94.2
+noise_10dB     analytic       2         1              1         91.0
+noise_10dB     realigned      2         1              1         90.9
+gain_-6        analytic       2         0              0        100.0
+gain_-6        realigned      2         5              1         85.3
+
+FPs by type, analytic:
+  erratic_pitch: 3
+  monotone: 2
+  rushed: 0
+
+FPs by type, realigned:
+  erratic_pitch: 1
+  monotone: 3
+  rushed: 31
+
+Realigned FPs by baseline duration (ms), all types, and rate only:
+  0-60: 0 (rate: 0)
+  60-120: 0 (rate: 0)
+  120-inf: 35 (rate: 31)
+
+FP regions (file, control, path, type, start-end, base_ms, magnitude):
+  synthetic01  identity  realigned  rushed  21.127-21.647  763  1.13
+  synthetic01  identity  realigned  rushed  31.91-32.831  1219  1.16
+  synthetic01  identity  realigned  rushed  35.932-38.433  2800  1.03
+  synthetic01  identity  realigned  rushed  49.696-50.757  1295  1.98
+  synthetic01  identity  realigned  rushed  54.098-55.218  1355  1.97
+  synthetic01  tempo_0.9  realigned  rushed  35.425-36.445  1219  1.14
+  synthetic01  tempo_0.9  realigned  rushed  39.906-42.666  2800  1.17
+  synthetic01  tempo_0.9  realigned  rushed  55.188-56.368  1295  2.2
+  synthetic01  tempo_0.9  realigned  rushed  60.068-61.308  1355  2.21
+  synthetic01  tempo_1.1  realigned  rushed  19.204-19.684  763  1.18
+  synthetic01  tempo_1.1  realigned  rushed  32.667-34.947  2800  0.98
+  synthetic01  tempo_1.1  realigned  rushed  45.169-46.149  1295  1.83
+  synthetic01  tempo_1.1  realigned  rushed  49.17-50.17  1355  1.91
+  synthetic01  pitch_-3  analytic  erratic_pitch  16.062-17.302  1240  1.42
+  synthetic01  pitch_-3  realigned  rushed  49.696-50.737  1295  1.82
+  synthetic01  pitch_-3  realigned  rushed  54.078-55.198  1355  1.75
+  synthetic01  pitch_+3  analytic  erratic_pitch  46.168-48.033  1865  1.66
+  synthetic01  pitch_+3  realigned  rushed  21.087-21.627  763  1.24
+  synthetic01  pitch_+3  realigned  rushed  35.932-38.433  2800  1.01
+  synthetic01  pitch_+3  realigned  rushed  49.676-50.737  1295  1.96
+  synthetic01  pitch_+3  realigned  rushed  54.078-55.178  1355  2.01
+  synthetic01  mp3_64k  realigned  rushed  21.183-21.703  763  1.39
+  synthetic01  mp3_64k  realigned  rushed  31.964-32.904  1219  1.14
+  synthetic01  mp3_64k  realigned  rushed  36.004-38.485  2800  1.17
+  synthetic01  mp3_64k  realigned  rushed  49.746-50.806  1295  2.21
+  synthetic01  mp3_64k  realigned  rushed  54.146-55.267  1355  2.1
+  synthetic01  noise_20dB  realigned  rushed  31.91-32.831  1219  1.02
+  synthetic01  noise_20dB  realigned  rushed  36.852-38.433  1837  0.94
+  synthetic01  gain_-6  realigned  rushed  21.127-21.647  763  1.13
+  synthetic01  gain_-6  realigned  rushed  31.91-32.831  1219  1.16
+  synthetic01  gain_-6  realigned  rushed  35.932-38.433  2800  1.03
+  synthetic01  gain_-6  realigned  rushed  49.696-50.757  1295  1.98
+  synthetic01  gain_-6  realigned  rushed  54.098-55.218  1355  1.97
+  speech1  pitch_-3  analytic  erratic_pitch  42.959-43.94  980  1.14
+  speech1  pitch_-3  realigned  erratic_pitch  42.979-43.92  980  0.97
+  speech1  pitch_+3  analytic  monotone  40.158-42.979  2821  1.64
+  speech1  pitch_+3  realigned  monotone  16.067-17.628  1581  1.18
+  speech1  pitch_+3  realigned  monotone  40.118-42.999  2821  1.47
+  speech1  noise_10dB  analytic  monotone  3.862-6.023  2161  1.73
+  speech1  noise_10dB  realigned  monotone  3.862-6.023  2161  1.74
