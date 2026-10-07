@@ -1,0 +1,155 @@
+{
+ "per_type": {
+  "dragging": {
+   "recall": 0.8333333333333334,
+   "precision": 0.8333333333333334,
+   "f1": 0.8333333333333334,
+   "tp": 5,
+   "fn": 1,
+   "fp": 1
+  },
+  "long_pause": {
+   "recall": 1.0,
+   "precision": 0.8333333333333334,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 0,
+   "fp": 1
+  },
+  "missing_pause": {
+   "recall": null,
+   "precision": 0.0,
+   "f1": 0.0,
+   "tp": 0,
+   "fn": 0,
+   "fp": 1
+  },
+  "monotone": {
+   "recall": 0.8333333333333334,
+   "precision": 1.0,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 1,
+   "fp": 0
+  },
+  "muffled": {
+   "recall": 1.0,
+   "precision": 1.0,
+   "f1": 1.0,
+   "tp": 8,
+   "fn": 0,
+   "fp": 0
+  },
+  "rushed": {
+   "recall": 0.6666666666666666,
+   "precision": 0.8,
+   "f1": 0.7272727272727272,
+   "tp": 4,
+   "fn": 2,
+   "fp": 1
+  },
+  "volume_drop": {
+   "recall": 0.8,
+   "precision": 0.5714285714285714,
+   "f1": 0.6666666666666666,
+   "tp": 4,
+   "fn": 1,
+   "fp": 3
+  }
+ },
+ "per_severity": {
+  "1": 0.3333333333333333,
+  "2": 0.9,
+  "3": 1.0,
+  "4": 1.0
+ },
+ "iou_0.5": {
+  "dragging": {
+   "recall": 0.6666666666666666,
+   "precision": 0.6666666666666666,
+   "f1": 0.6666666666666666,
+   "tp": 4,
+   "fn": 2,
+   "fp": 2
+  },
+  "long_pause": {
+   "recall": 1.0,
+   "precision": 0.8333333333333334,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 0,
+   "fp": 1
+  },
+  "missing_pause": {
+   "recall": null,
+   "precision": 0.0,
+   "f1": 0.0,
+   "tp": 0,
+   "fn": 0,
+   "fp": 1
+  },
+  "monotone": {
+   "recall": 0.8333333333333334,
+   "precision": 1.0,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 1,
+   "fp": 0
+  },
+  "muffled": {
+   "recall": 0.875,
+   "precision": 0.875,
+   "f1": 0.875,
+   "tp": 7,
+   "fn": 1,
+   "fp": 1
+  },
+  "rushed": {
+   "recall": 0.5,
+   "precision": 0.6,
+   "f1": 0.5454545454545454,
+   "tp": 3,
+   "fn": 3,
+   "fp": 2
+  },
+  "volume_drop": {
+   "recall": 0.8,
+   "precision": 0.5714285714285714,
+   "f1": 0.6666666666666666,
+   "tp": 4,
+   "fn": 1,
+   "fp": 3
+  }
+ },
+ "boundary_mae_s": {
+  "start": 0.26869677419354837,
+  "end": 0.22826129032258025,
+  "mean_iou": 0.8561177711413108
+ },
+ "controls": {
+  "files": 2,
+  "false_regions": 0
+ },
+ "flagged_words_le_40ms": {
+  "all": {
+   "short": 4,
+   "total": 202
+  },
+  "rate": {
+   "short": 3,
+   "total": 59
+  },
+  "fp": {
+   "short": 1,
+   "total": 15
+  }
+ },
+ "score_vs_severity_spearman": {
+  "dragging": -1.0,
+  "long_pause": -1.0,
+  "monotone": -1.0,
+  "muffled": -1.0,
+  "rushed": -0.9486832980505139,
+  "volume_drop": -1.0
+ }
+}

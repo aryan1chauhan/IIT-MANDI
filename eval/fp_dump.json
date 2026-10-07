@@ -1,0 +1,241 @@
+[
+  {
+    "file": "synthetic01__dragging_s2",
+    "fp_type": "dragging",
+    "fp_start": 53.317,
+    "fp_end": 54.117,
+    "fp_dur": 0.8,
+    "magnitude": 1.28,
+    "text": "it is",
+    "classification": "type_confusion",
+    "overlaps": [
+      {
+        "injected_type": "dragging",
+        "injected_start": 53.249,
+        "injected_end": 58.801,
+        "injected_severity": 2,
+        "iou": 0.144,
+        "inter_sec": 0.8,
+        "pct_of_fp": 100.0
+      }
+    ],
+    "all_injected": [
+      {
+        "type": "dragging",
+        "start": 53.249,
+        "end": 58.801,
+        "sev": 2
+      }
+    ]
+  },
+  {
+    "file": "synthetic01__dragging_s3",
+    "fp_type": "volume_drop",
+    "fp_start": 54.572,
+    "fp_end": 56.372,
+    "fp_dur": 1.8,
+    "magnitude": 0.87,
+    "text": "a promise we",
+    "classification": "type_confusion",
+    "overlaps": [
+      {
+        "injected_type": "dragging",
+        "injected_start": 53.249,
+        "injected_end": 60.035,
+        "injected_severity": 3,
+        "iou": 0.265,
+        "inter_sec": 1.8,
+        "pct_of_fp": 100.0
+      }
+    ],
+    "all_injected": [
+      {
+        "type": "dragging",
+        "start": 53.249,
+        "end": 60.035,
+        "sev": 3
+      }
+    ]
+  },
+  {
+    "file": "synthetic01__dragging_s4",
+    "fp_type": "long_pause",
+    "fp_start": 54.891,
+    "fp_end": 55.591,
+    "fp_dur": 0.7,
+    "magnitude": 1.14,
+    "text": "promise",
+    "classification": "type_confusion",
+    "overlaps": [
+      {
+        "injected_type": "dragging",
+        "injected_start": 53.249,
+        "injected_end": 61.474,
+        "injected_severity": 4,
+        "iou": 0.085,
+        "inter_sec": 0.7,
+        "pct_of_fp": 100.0
+      }
+    ],
+    "all_injected": [
+      {
+        "type": "dragging",
+        "start": 53.249,
+        "end": 61.474,
+        "sev": 4
+      }
+    ]
+  },
+  {
+    "file": "synthetic01__mixed_0",
+    "fp_type": "volume_drop",
+    "fp_start": 31.163,
+    "fp_end": 32.743,
+    "fp_dur": 1.58,
+    "magnitude": 1.28,
+    "text": "the people who",
+    "classification": "type_confusion",
+    "overlaps": [
+      {
+        "injected_type": "dragging",
+        "injected_start": 28.87,
+        "injected_end": 35.543,
+        "injected_severity": 3,
+        "iou": 0.237,
+        "inter_sec": 1.58,
+        "pct_of_fp": 100.0
+      }
+    ],
+    "all_injected": [
+      {
+        "type": "rushed",
+        "start": 2.934,
+        "end": 4.518,
+        "sev": 4
+      },
+      {
+        "type": "dragging",
+        "start": 28.87,
+        "end": 35.543,
+        "sev": 3
+      },
+      {
+        "type": "muffled",
+        "start": 59.477,
+        "end": 63.105,
+        "sev": 2
+      }
+    ]
+  },
+  {
+    "file": "synthetic01__mixed_2",
+    "fp_type": "volume_drop",
+    "fp_start": 32.346,
+    "fp_end": 33.626,
+    "fp_dur": 1.28,
+    "magnitude": 1.02,
+    "text": "the people who",
+    "classification": "type_confusion",
+    "overlaps": [
+      {
+        "injected_type": "dragging",
+        "injected_start": 30.454,
+        "injected_end": 34.735,
+        "injected_severity": 2,
+        "iou": 0.299,
+        "inter_sec": 1.28,
+        "pct_of_fp": 100.0
+      }
+    ],
+    "all_injected": [
+      {
+        "type": "muffled",
+        "start": 2.934,
+        "end": 7.026,
+        "sev": 4
+      },
+      {
+        "type": "dragging",
+        "start": 30.454,
+        "end": 34.735,
+        "sev": 2
+      },
+      {
+        "type": "volume_drop",
+        "start": 59.543,
+        "end": 64.077,
+        "sev": 2
+      }
+    ]
+  },
+  {
+    "file": "synthetic01__mixed_3",
+    "fp_type": "missing_pause",
+    "fp_start": 4.301,
+    "fp_end": 4.351,
+    "fp_dur": 0.05,
+    "magnitude": 1.76,
+    "text": "but",
+    "classification": "type_confusion",
+    "overlaps": [
+      {
+        "injected_type": "rushed",
+        "injected_start": 2.934,
+        "injected_end": 4.98,
+        "injected_severity": 4,
+        "iou": 0.024,
+        "inter_sec": 0.05,
+        "pct_of_fp": 100.0
+      }
+    ],
+    "all_injected": [
+      {
+        "type": "rushed",
+        "start": 2.934,
+        "end": 4.98,
+        "sev": 4
+      },
+      {
+        "type": "monotone",
+        "start": 28.408,
+        "end": 31.968,
+        "sev": 2
+      },
+      {
+        "type": "muffled",
+        "start": 56.386,
+        "end": 60.014,
+        "sev": 4
+      }
+    ]
+  },
+  {
+    "file": "synthetic01__rushed_s3",
+    "fp_type": "rushed",
+    "fp_start": 48.745,
+    "fp_end": 49.205,
+    "fp_dur": 0.46,
+    "magnitude": 1.26,
+    "text": "is not",
+    "classification": "type_confusion",
+    "overlaps": [
+      {
+        "injected_type": "rushed",
+        "injected_start": 48.697,
+        "injected_end": 51.212,
+        "injected_severity": 3,
+        "iou": 0.183,
+        "inter_sec": 0.46,
+        "pct_of_fp": 100.0
+      }
+    ],
+    "all_injected": [
+      {
+        "type": "rushed",
+        "start": 48.697,
+        "end": 51.212,
+        "sev": 3
+      }
+    ]
+  }
+]

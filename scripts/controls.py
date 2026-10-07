@@ -21,17 +21,24 @@ from speechlens.text import load_alignment
 SR = 16000   # assumes load_audio returns 16 kHz mono float32 (MMS_FA requires 16 kHz)
 
 
+def _best_alignment(data, stem, subdir="alignments"):
+    """Prefer MMS_FA alignment (matched provenance) over eSpeak ground-truth."""
+    mmsfa = data / subdir / f"{stem}_mmsfa.json"
+    plain = data / subdir / f"{stem}.json"
+    if mmsfa.exists():
+        return load_alignment(mmsfa)
+    return load_alignment(plain) if plain.exists() else None
+
+
 def find_clean_baselines(data_dir="data"):
     data, out = Path(data_dir), []
     for p in (data / "baseline").glob("*.wav"):
-        a = data / "alignments" / f"{p.stem}.json"
-        out.append(dict(id=p.stem, path=str(p), words=load_alignment(a) if a.exists() else None,
+        out.append(dict(id=p.stem, path=str(p), words=_best_alignment(data, p.stem),
                         transcript=(data / "transcripts" / f"{p.stem}.txt").read_text(encoding="utf-8")))
     for p in (data / "real" / "baseline").glob("*.wav"):
         t = data / "real" / "transcripts" / f"{p.stem}.txt"
         t = t if t.exists() else data / "transcripts" / f"{p.stem}.txt"
-        a = data / "real" / "alignments" / f"{p.stem}.json"
-        out.append(dict(id=p.stem, path=str(p), words=load_alignment(a) if a.exists() else None,
+        out.append(dict(id=p.stem, path=str(p), words=_best_alignment(data, p.stem, "real/alignments"),
                         transcript=t.read_text(encoding="utf-8")))
     return out
 
@@ -126,13 +133,19 @@ def main(data_dir, out_dir, tmp="data/_controls_tmp"):
                 rows.append(dict(id=b["id"], control=name, path=kind, lag_s=round(lag, 4),
                                  n_fp=len(regs), overall=sc["overall"]))
                 for r in regs:
+                    w_start, w_end = r["word_start"], r["word_end"]
+                    dur_p = [pw[k]["end"] - pw[k]["start"] for k in range(w_start, w_end + 1)]
+                    dur_b = [base_words[k]["end"] - base_words[k]["start"] for k in range(w_start, w_end + 1)]
+                    n_le_40ms = sum(dp <= 0.040 or db <= 0.040 for dp, db in zip(dur_p, dur_b))
                     fps.append(dict(id=b["id"], control=name, path=kind, type=r["type"],
                                     start=round(r["start"], 3), end=round(r["end"], 3),
                                     base_dur_ms=round(1000 * (r["base_end"] - r["base_start"])),
-                                    magnitude=round(r["magnitude"], 2)))
+                                    magnitude=round(r["magnitude"], 2),
+                                    n_words=len(dur_p),
+                                    n_words_le_40ms=n_le_40ms))
 
     row_fields = ["id", "control", "path", "lag_s", "n_fp", "overall"]
-    fp_fields = ["id", "control", "path", "type", "start", "end", "base_dur_ms", "magnitude"]
+    fp_fields = ["id", "control", "path", "type", "start", "end", "base_dur_ms", "magnitude", "n_words", "n_words_le_40ms"]
     for fname, d, fields in (("controls_rows.csv", rows, row_fields), ("controls_fp.csv", fps, fp_fields)):
         with open(Path(out_dir) / fname, "w", newline="") as f:
             w = csv.DictWriter(f, fieldnames=fields)
@@ -140,7 +153,7 @@ def main(data_dir, out_dir, tmp="data/_controls_tmp"):
             if d:
                 w.writerows(d)
 
-    summarize(rows, fps, Path(out_dir) / "controls_2026-10-05.txt")
+    summarize(rows, fps, Path(out_dir) / "controls_matched.txt")
 
 
 def summarize(rows, fps, out_path):
@@ -155,12 +168,20 @@ def summarize(rows, fps, out_path):
         L += ["", f"FPs by type, {pk}:"]
         types = sorted({f["type"] for f in fps})
         L += [f"  {t}: {sum(f['type'] == t and f['path'] == pk for f in fps)}" for t in types]
+    for pk in ("analytic", "realigned"):
+        L += ["", f"Flagged words with duration <= 40 ms on either side ({pk}):"]
+        total_w = sum(f.get("n_words", 0) for f in fps if f["path"] == pk)
+        total_short = sum(f.get("n_words_le_40ms", 0) for f in fps if f["path"] == pk)
+        rate_w = sum(f.get("n_words", 0) for f in fps if f["path"] == pk and f["type"] in ("rushed", "dragging"))
+        rate_short = sum(f.get("n_words_le_40ms", 0) for f in fps if f["path"] == pk and f["type"] in ("rushed", "dragging"))
+        L.append(f"  All types: {total_short}/{total_w} words ({100*total_short/max(total_w, 1):.1f}%) <= 40 ms on either side")
+        L.append(f"  Rate only: {rate_short}/{rate_w} words ({100*rate_short/max(rate_w, 1):.1f}%) <= 40 ms on either side")
     L += ["", "Realigned FPs by baseline duration (ms), all types, and rate only:"]
     for lo, hi in ((0, 60), (60, 120), (120, 10**6)):
         sel = [f for f in fps if f["path"] == "realigned" and lo <= f["base_dur_ms"] < hi]
         L.append(f"  {lo}-{hi if hi < 10**6 else 'inf'}: {len(sel)} (rate: {sum(f['type'] == 'rushed' or f['type'] == 'dragging' for f in sel)})")
-    L += ["", "FP regions (file, control, path, type, start-end, base_ms, magnitude):"]
-    L += [f"  {f['id']}  {f['control']}  {f['path']}  {f['type']}  {f['start']}-{f['end']}  {f['base_dur_ms']}  {f['magnitude']}" for f in fps]
+    L += ["", "FP regions (file, control, path, type, start-end, base_ms, magnitude, words, <=40ms):"]
+    L += [f"  {f['id']}  {f['control']}  {f['path']}  {f['type']}  {f['start']}-{f['end']}  {f['base_dur_ms']}  {f['magnitude']}  words={f.get('n_words', 0)}  short={f.get('n_words_le_40ms', 0)}" for f in fps]
     out_path.write_text("\n".join(L), encoding="utf-8")
     print("\n".join(L[:40]))
 

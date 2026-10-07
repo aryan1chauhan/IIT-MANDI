@@ -1,0 +1,54 @@
+control        path       files  FP_total  files_with_FP  mean_overall
+identity       analytic       2         0              0        100.0
+identity       realigned      2         0              0        100.0
+tempo_0.9      analytic       2         0              0        100.0
+tempo_0.9      realigned      2         0              0        100.0
+tempo_1.1      analytic       2         0              0        100.0
+tempo_1.1      realigned      2         0              0        100.0
+pitch_-3       analytic       2         2              2         93.8
+pitch_-3       realigned      2         1              1         97.0
+pitch_+3       analytic       2         2              2         84.5
+pitch_+3       realigned      2         3              2         84.2
+mp3_64k        analytic       2         0              0        100.0
+mp3_64k        realigned      2         0              0        100.0
+noise_20dB     analytic       2         0              0        100.0
+noise_20dB     realigned      2         0              0        100.0
+noise_10dB     analytic       2         1              1         91.0
+noise_10dB     realigned      2         1              1         90.9
+gain_-6        analytic       2         0              0        100.0
+gain_-6        realigned      2         0              0        100.0
+
+FPs by type, analytic:
+  dragging: 0
+  erratic_pitch: 3
+  monotone: 2
+
+FPs by type, realigned:
+  dragging: 1
+  erratic_pitch: 1
+  monotone: 3
+
+Flagged words with duration <= 40 ms on either side (analytic):
+  All types: 3/15 words (20.0%) <= 40 ms on either side
+  Rate only: 0/0 words (0.0%) <= 40 ms on either side
+
+Flagged words with duration <= 40 ms on either side (realigned):
+  All types: 3/16 words (18.8%) <= 40 ms on either side
+  Rate only: 0/3 words (0.0%) <= 40 ms on either side
+
+Realigned FPs by baseline duration (ms), all types, and rate only:
+  0-60: 0 (rate: 0)
+  60-120: 0 (rate: 0)
+  120-inf: 5 (rate: 1)
+
+FP regions (file, control, path, type, start-end, base_ms, magnitude, words, <=40ms):
+  synthetic01  pitch_-3  analytic  erratic_pitch  16.065-17.266  1200  1.25  words=3  short=0
+  synthetic01  pitch_+3  analytic  erratic_pitch  46.215-47.936  1720  1.44  words=3  short=0
+  synthetic01  pitch_+3  realigned  dragging  31.83-32.851  920  1.03  words=3  short=0
+  speech1  pitch_-3  analytic  erratic_pitch  42.959-43.94  980  1.14  words=3  short=1
+  speech1  pitch_-3  realigned  erratic_pitch  42.979-43.92  980  0.97  words=3  short=1
+  speech1  pitch_+3  analytic  monotone  40.158-42.979  2821  1.64  words=3  short=1
+  speech1  pitch_+3  realigned  monotone  16.067-17.628  1581  1.18  words=4  short=0
+  speech1  pitch_+3  realigned  monotone  40.118-42.999  2821  1.47  words=3  short=1
+  speech1  noise_10dB  analytic  monotone  3.862-6.023  2161  1.73  words=3  short=1
+  speech1  noise_10dB  realigned  monotone  3.862-6.023  2161  1.74  words=3  short=1

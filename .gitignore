@@ -17,9 +17,10 @@ __pycache__/
 *.ogg
 *.m4a
 
-# Temporary control directories
+# Temporary control directories and alignment cache
 _controls_tmp/
 data/_controls_tmp/
+*.align.json
 
 # Model weights / Hub cache
 .cache/
