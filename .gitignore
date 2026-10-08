@@ -16,6 +16,8 @@ __pycache__/
 *.mp3
 *.ogg
 *.m4a
+*.zip
+
 
 # Temporary control directories and alignment cache
 _controls_tmp/
@@ -29,6 +31,16 @@ checkpoints/
 *.pth
 *.bin
 
-# OS generated files
+# OS / IDE generated files
 .DS_Store
 Thumbs.db
+*.code-workspace
+
+# Agent planning and scratchpad
+.planning/
+speechlens_data.zip
+scripts/dump_identity_words.py
+eval/results_shared_bounds_rejected.json
+data/alignments/*espeak*.json
+
+

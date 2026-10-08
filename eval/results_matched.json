@@ -1,5 +1,5 @@
 {
- "per_type": {
+ "per_type_iou_0.3": {
   "dragging": {
    "recall": 0.6666666666666666,
    "precision": 1.0,

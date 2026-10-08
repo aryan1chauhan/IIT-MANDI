@@ -1,6 +1,6 @@
 # SpeechLens — Edge Cases
 
-> Derived from [`ARCHITECTURE.md`](file:///c:/Personal/IIT%20MANDI/docs/ARCHITECTURE.md), [`problem_statement.md`](file:///c:/Personal/IIT%20MANDI/docs/problem_statement.md), and direct code inspection of every module.
+> Derived from [`ARCHITECTURE.md`](ARCHITECTURE.md), [`problem_statement.md`](problem_statement.md), and direct code inspection of every module.
 
 ---
 

@@ -106,7 +106,7 @@ def main():
                 fp_flagged_words += n_tot
                 fp_short_flagged_words += n_short
 
-    out = {"per_type": {}, "per_severity_iou_0.5": {}, "iou_0.5": {}}
+    out = {"per_type_iou_0.3": {}, "per_severity_iou_0.5": {}, "iou_0.5": {}}
     for thr in (0.3, 0.5):
         t_tp, t_fn, t_fp = defaultdict(int), defaultdict(int), defaultdict(int)
         s_tp, s_n = defaultdict(int), defaultdict(int)
@@ -139,7 +139,7 @@ def main():
         print(f"\nPer flaw type (IoU>={thr:.1f}, type must match)")
         print(f"Overall: Recall={tot_tp}/{tot_tp+tot_fn} ({micro_r:.2f}), Precision={tot_tp}/{tot_tp+tot_fp} ({micro_p:.2f}), F1={micro_f1:.2f}")
         print(f"{'type':14s} {'recall':>7s} {'precision':>10s} {'F1':>6s} {'TP':>4s} {'FN':>4s} {'FP':>4s}")
-        target_dict = out["per_type"] if thr == 0.3 else out["iou_0.5"]
+        target_dict = out["per_type_iou_0.3"] if thr == 0.3 else out["iou_0.5"]
         for k in sorted(set(t_tp) | set(t_fn) | set(t_fp)):
             has_ground_truth = (t_tp[k] + t_fn[k]) > 0
             r = t_tp[k] / max(t_tp[k] + t_fn[k], 1) if has_ground_truth else None

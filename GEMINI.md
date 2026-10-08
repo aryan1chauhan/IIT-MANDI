@@ -27,7 +27,7 @@
 ## 2. CodeRabbit: Autonomous Deep Code Review & Quality Assurance
 
 - **Mandatory Self-Review on Every Code Edit**:
-  - **Edge Cases**: Check against [`docs/edge_cases.md`](file:///c:/Personal/IIT%20MANDI/docs/edge_cases.md) (e.g. empty/short audio, index bounds, zero division, silence).
+  - **Edge Cases**: Check against [`docs/edge_cases.md`](docs/edge_cases.md) (e.g. empty/short audio, index bounds, zero division, silence).
   - **Zero Silent Failures**: No unhandled NaNs or swallowed errors. Functions must fail fast with clear errors rather than returning corrupt state.
   - **Diff Cleanliness**: Ensure no stray print statements, broken imports, or unintended modifications.
   - **Verification Gate**: Never declare a task complete without running and verifying test suites.
@@ -51,8 +51,8 @@
 ## 4. Get Shit Done (GSD): Structured Planning & State Tracking
 
 - **State Persistence**:
-  - Track current milestone, completed work, and active phase in [`.planning/STATE.md`](file:///c:/Personal/IIT%20MANDI/.planning/STATE.md).
-  - High-level architecture in [`.planning/PROJECT.md`](file:///c:/Personal/IIT%20MANDI/.planning/PROJECT.md) and phases in [`.planning/ROADMAP.md`](file:///c:/Personal/IIT%20MANDI/.planning/ROADMAP.md).
+  - Track current milestone, completed work, and active phase in [`.planning/STATE.md`](.planning/STATE.md).
+  - High-level architecture in [`.planning/PROJECT.md`](.planning/PROJECT.md) and phases in [`.planning/ROADMAP.md`](.planning/ROADMAP.md).
 - **Atomic Milestones**:
   - Complete work in verifiable phases.
   - Each phase must have clear acceptance criteria verified by tests before proceeding to the next.
