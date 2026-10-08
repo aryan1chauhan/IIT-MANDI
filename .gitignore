@@ -38,6 +38,8 @@ Thumbs.db
 
 # Agent planning and scratchpad
 .planning/
+AGENTS.md
+GEMINI.md
 speechlens_data.zip
 scripts/dump_identity_words.py
 eval/results_shared_bounds_rejected.json

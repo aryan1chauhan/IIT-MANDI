@@ -29,6 +29,11 @@ injected flaws applied to whole-word spans, so labels are exact and re-timed wor
 - Seeds come from CRC32 of (speech, flaw, severity): fully reproducible across machines.
 - Licensing: avoid CC BY-NC-ND material (TED) for the published dataset, since modified copies are derivatives.
 
+## Prerequisites
+- **Python**: 3.11 or 3.12
+- **FFmpeg**: Required for audio processing (`atempo` filter). Must be on system `PATH`.
+- **eSpeak-NG**: Required for synthetic baseline fixtures and automated unit tests (`espeak-ng.exe`).
+
 ## Setup (Windows PowerShell)
 ```powershell
 py -3.11 -m venv .venv ; .\.venv\Scripts\Activate.ps1
