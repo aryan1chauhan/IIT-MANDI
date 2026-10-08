@@ -43,6 +43,20 @@ def test_gain_change_is_not_a_flaw(base):
     assert analyze(y * 0.5, w, y, w)["regions"] == []
 
 
+def test_pitch_bounds_are_reported_for_both_recordings(base):
+    y, w = base
+    bounds = analyze(y, w, y, w)["global"]["f0_bounds_hz"]
+    assert bounds["participant"] == bounds["baseline"]
+    assert 0 < bounds["participant"][0] < bounds["participant"][1]
+
+
+def test_duration_injections_change_audio_length_in_the_expected_direction(base):
+    y, w = base
+    rushed, _, _ = make_flawed(y, w, _single(w, "rushed"))
+    dragging, _, _ = make_flawed(y, w, _single(w, "dragging"))
+    assert len(rushed) < len(y) < len(dragging)
+
+
 @pytest.mark.parametrize("flaw", FLAWS)
 def test_severe_flaw_is_localised(base, flaw):
     y, w = base

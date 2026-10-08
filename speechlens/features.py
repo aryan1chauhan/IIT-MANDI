@@ -28,6 +28,8 @@ class Features:
     mfcc: np.ndarray       # (13, T), cepstral-mean-normalised
     active: np.ndarray     # speech-activity mask
     f0_median_hz: float
+    f0_floor_hz: float
+    f0_ceiling_hz: float
 
 
 def _drop_octave_jumps(f0_st, win=11, max_dev=6.0):
@@ -45,6 +47,19 @@ def _drop_octave_jumps(f0_st, win=11, max_dev=6.0):
     out = f0_st.copy()
     out[np.abs(f0_st - local) > max_dev] = np.nan
     return out
+
+
+def _adaptive_pitch_bounds(snd: parselmouth.Sound) -> tuple[float, float]:
+    """Estimate stable F0 bounds from a wide first pass."""
+    p1 = snd.to_pitch_ac(time_step=HOP / snd.sampling_frequency, pitch_floor=50, pitch_ceiling=600,
+                         silence_threshold=0.01)
+    f0_1 = p1.selected_array["frequency"]
+    v1 = f0_1[f0_1 > 0]
+    if len(v1) < 10:
+        return 75.0, 500.0
+    q25 = float(np.percentile(v1, 25))
+    q75 = float(np.percentile(v1, 75))
+    return max(45.0, 0.75 * q25), min(650.0, 2.5 * q75)
 
 
 def extract(y: np.ndarray, sr: int = SR) -> Features:
@@ -66,7 +81,11 @@ def extract(y: np.ndarray, sr: int = SR) -> Features:
     hf_db = 10 * np.log10(S[freqs >= HF_CUTOFF_HZ].sum(0) / (S.sum(0) + 1e-12) + 1e-9)
 
     snd = parselmouth.Sound(y.astype(np.float64), sampling_frequency=sr)
-    pitch = snd.to_pitch_ac(time_step=HOP / sr, pitch_floor=75, pitch_ceiling=500,
+    # de Looze & Hirst (2014) two-pass pitch estimation.
+    floor, ceiling = _adaptive_pitch_bounds(snd)
+
+    # Pass 2: Re-estimate with speaker-adapted boundaries
+    pitch = snd.to_pitch_ac(time_step=HOP / sr, pitch_floor=floor, pitch_ceiling=ceiling,
                             silence_threshold=0.005)  # low: keep quiet passages voiced
     f0 = pitch.selected_array["frequency"]
     px = pitch.xs()
@@ -79,7 +98,7 @@ def extract(y: np.ndarray, sr: int = SR) -> Features:
     f0_st = _drop_octave_jumps(f0_st)
 
     mfcc = mfcc - mfcc.mean(axis=1, keepdims=True)
-    return Features(sr, t, f0_st, energy_db, hf_db, mfcc, active, med)
+    return Features(sr, t, f0_st, energy_db, hf_db, mfcc, active, med, floor, ceiling)
 
 
 def _sl(t, a, b):

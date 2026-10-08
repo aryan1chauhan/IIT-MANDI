@@ -9,6 +9,8 @@ import zlib
 
 import librosa
 import numpy as np
+import parselmouth
+from parselmouth.praat import call
 import soundfile as sf
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -64,7 +66,14 @@ def tempo(y, r):
 
 
 def pitch(y, st):
-    return librosa.effects.pitch_shift(y, sr=SR, n_steps=st).astype(np.float32)
+    snd = parselmouth.Sound(y.astype(np.float64), sampling_frequency=SR)
+    manip = call(snd, "To Manipulation", 0.01, 50, 500)
+    pt = call(manip, "Extract pitch tier")
+    call(pt, "Multiply frequencies", 0.0, snd.duration, 2.0**(st / 12.0))
+    call([manip, pt], "Replace pitch tier")
+    resynth = call(manip, "Get resynthesis (overlap-add)")
+    y_out = resynth.values[0].astype(np.float32)
+    return y_out[:len(y)] if len(y_out) >= len(y) else np.pad(y_out, (0, len(y) - len(y_out)))
 
 
 def mp3(y, kbps=64):

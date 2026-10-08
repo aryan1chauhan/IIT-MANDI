@@ -6,619 +6,619 @@
   {
    "type": "dragging",
    "severity": 3,
-   "start": 53.2493,
-   "end": 60.0346,
-   "word_start": 97,
-   "word_end": 105,
-   "base_start": 53.2493,
-   "base_end": 57.3616
+   "start": 29.2496,
+   "end": 36.4176,
+   "word_start": 52,
+   "word_end": 60,
+   "base_start": 29.2496,
+   "base_end": 33.611
   }
  ],
  "words": [
   {
    "word": "we",
-   "start": 0.5,
-   "end": 0.8824
+   "start": 0.5402,
+   "end": 0.7002
   },
   {
    "word": "gather",
-   "start": 0.9672,
-   "end": 1.4123
+   "start": 0.9603,
+   "end": 1.3805
   },
   {
    "word": "today",
-   "start": 1.4636,
-   "end": 1.9926
+   "start": 1.4605,
+   "end": 1.9206
   },
   {
    "word": "not",
-   "start": 2.4237,
-   "end": 2.8525
+   "start": 2.4608,
+   "end": 2.8009
   },
   {
    "word": "to",
-   "start": 2.9336,
-   "end": 3.2547
+   "start": 2.921,
+   "end": 3.041
   },
   {
    "word": "mourn",
-   "start": 3.3181,
-   "end": 3.8242
+   "start": 3.3811,
+   "end": 3.7412
   },
   {
    "word": "what",
-   "start": 3.8781,
-   "end": 4.257
+   "start": 3.9013,
+   "end": 4.2214
   },
   {
    "word": "was",
-   "start": 4.3193,
-   "end": 4.7915
+   "start": 4.3614,
+   "end": 4.7416
   },
   {
    "word": "lost",
-   "start": 4.8592,
-   "end": 5.3413
+   "start": 4.9416,
+   "end": 5.3017
   },
   {
    "word": "but",
-   "start": 5.7602,
-   "end": 6.1019
+   "start": 5.7419,
+   "end": 6.062
   },
   {
    "word": "to",
-   "start": 6.1913,
-   "end": 6.5162
+   "start": 6.182,
+   "end": 6.3021
   },
   {
    "word": "build",
-   "start": 6.5643,
-   "end": 7.026
+   "start": 6.5822,
+   "end": 7.0023
   },
   {
    "word": "what",
-   "start": 7.0682,
-   "end": 7.4471
+   "start": 7.1023,
+   "end": 7.4024
   },
   {
    "word": "comes",
-   "start": 7.5129,
-   "end": 8.0452
+   "start": 7.5225,
+   "end": 8.0026
   },
   {
    "word": "next",
-   "start": 8.1311,
-   "end": 8.6657
+   "start": 8.1827,
+   "end": 8.6228
   },
   {
    "word": "every",
-   "start": 9.2686,
-   "end": 9.7291
+   "start": 9.3231,
+   "end": 9.6832
   },
   {
    "word": "great",
-   "start": 9.7815,
-   "end": 10.1664
+   "start": 9.7632,
+   "end": 10.1233
   },
   {
    "word": "effort",
-   "start": 10.2161,
-   "end": 10.6928
+   "start": 10.2634,
+   "end": 10.6635
   },
   {
    "word": "begins",
-   "start": 10.7428,
-   "end": 11.3855
+   "start": 10.7435,
+   "end": 11.3437
   },
   {
    "word": "with",
-   "start": 11.4257,
-   "end": 11.8705
+   "start": 11.4638,
+   "end": 11.8439
   },
   {
    "word": "a",
-   "start": 11.9182,
-   "end": 12.2461
+   "start": 11.9839,
+   "end": 12.0039
   },
   {
    "word": "small",
-   "start": 12.3301,
-   "end": 12.8285
+   "start": 12.3641,
+   "end": 12.7842
   },
   {
    "word": "decision",
-   "start": 12.9109,
-   "end": 13.4606
+   "start": 12.9042,
+   "end": 13.4244
   },
   {
    "word": "and",
-   "start": 13.8718,
-   "end": 14.2885
+   "start": 13.9246,
+   "end": 14.2247
   },
   {
    "word": "a",
-   "start": 14.3555,
-   "end": 14.6818
+   "start": 14.4247,
+   "end": 14.4447
   },
   {
    "word": "stubborn",
-   "start": 14.7653,
-   "end": 15.312
+   "start": 14.7849,
+   "end": 15.265
   },
   {
    "word": "refusal",
-   "start": 15.3819,
-   "end": 16.0031
+   "start": 15.4051,
+   "end": 15.9652
   },
   {
    "word": "to",
-   "start": 16.0624,
-   "end": 16.3901
+   "start": 16.0653,
+   "end": 16.1653
   },
   {
    "word": "turn",
-   "start": 16.4376,
-   "end": 16.8629
+   "start": 16.4254,
+   "end": 16.7855
   },
   {
    "word": "back",
-   "start": 16.9219,
-   "end": 17.3025
+   "start": 16.9056,
+   "end": 17.2657
   },
   {
    "word": "when",
-   "start": 17.9205,
-   "end": 18.3744
+   "start": 17.9659,
+   "end": 18.286
   },
   {
    "word": "the",
-   "start": 18.4463,
-   "end": 18.7458
+   "start": 18.5061,
+   "end": 18.6461
   },
   {
    "word": "road",
-   "start": 18.7933,
-   "end": 19.2782
+   "start": 18.8862,
+   "end": 19.2463
   },
   {
    "word": "ahead",
-   "start": 19.3301,
-   "end": 19.8108
+   "start": 19.3464,
+   "end": 19.7865
   },
   {
    "word": "is",
-   "start": 19.8556,
-   "end": 20.2246
+   "start": 19.9265,
+   "end": 20.1666
   },
   {
    "word": "steep",
-   "start": 20.2754,
-   "end": 20.7299
+   "start": 20.3067,
+   "end": 20.6468
   },
   {
    "word": "we",
-   "start": 21.075,
-   "end": 21.458
+   "start": 21.1269,
+   "end": 21.287
   },
   {
    "word": "do",
-   "start": 21.5311,
-   "end": 21.8382
+   "start": 21.5271,
+   "end": 21.6471
   },
   {
    "word": "not",
-   "start": 21.9204,
-   "end": 22.3497
+   "start": 21.9672,
+   "end": 22.3073
   },
   {
    "word": "ask",
-   "start": 22.4349,
-   "end": 22.8262
+   "start": 22.5074,
+   "end": 22.7875
   },
   {
    "word": "whether",
-   "start": 22.8735,
-   "end": 23.3532
+   "start": 22.9075,
+   "end": 23.3277
   },
   {
    "word": "the",
-   "start": 23.4396,
-   "end": 23.7443
+   "start": 23.5077,
+   "end": 23.6478
   },
   {
    "word": "climb",
-   "start": 23.7934,
-   "end": 24.3297
+   "start": 23.7878,
+   "end": 24.288
   },
   {
    "word": "is",
-   "start": 24.4018,
-   "end": 24.7711
+   "start": 24.468,
+   "end": 24.7281
   },
   {
    "word": "easy",
-   "start": 24.8299,
-   "end": 25.2143
+   "start": 24.8882,
+   "end": 25.1483
   },
   {
    "word": "we",
-   "start": 25.5502,
-   "end": 25.9322
+   "start": 25.6084,
+   "end": 25.7685
   },
   {
    "word": "ask",
-   "start": 26.0161,
-   "end": 26.4008
+   "start": 26.0886,
+   "end": 26.3687
   },
   {
    "word": "whether",
-   "start": 26.4682,
-   "end": 26.958
+   "start": 26.5087,
+   "end": 26.9288
   },
   {
    "word": "it",
-   "start": 27.0356,
-   "end": 27.3237
+   "start": 27.0889,
+   "end": 27.289
   },
   {
    "word": "is",
-   "start": 27.3824,
-   "end": 27.7518
+   "start": 27.449,
+   "end": 27.7091
   },
   {
    "word": "worth",
-   "start": 27.7979,
-   "end": 28.2244
+   "start": 27.8491,
+   "end": 28.2293
   },
   {
    "word": "it",
-   "start": 28.2973,
-   "end": 28.58
+   "start": 28.3493,
+   "end": 28.5494
   },
   {
    "word": "it",
-   "start": 29.1847,
-   "end": 29.4691
+   "start": 29.2496,
+   "end": 29.5456
   },
   {
    "word": "is",
-   "start": 29.5263,
-   "end": 29.8965
+   "start": 29.8086,
+   "end": 30.236
   },
   {
    "word": "worth",
-   "start": 29.9707,
-   "end": 30.388
+   "start": 30.4992,
+   "end": 31.1239
   },
   {
    "word": "it",
-   "start": 30.4539,
-   "end": 30.7428
+   "start": 31.354,
+   "end": 31.65
   },
   {
    "word": "because",
-   "start": 31.1792,
-   "end": 31.7464
+   "start": 32.4061,
+   "end": 33.3268
   },
   {
    "word": "the",
-   "start": 31.8331,
-   "end": 32.1356
+   "start": 33.6228,
+   "end": 33.8201
   },
   {
    "word": "people",
-   "start": 32.2132,
-   "end": 32.6349
+   "start": 34.1161,
+   "end": 34.8394
   },
   {
    "word": "who",
-   "start": 32.6818,
-   "end": 33.0522
+   "start": 34.971,
+   "end": 35.1354
   },
   {
    "word": "follow",
-   "start": 33.133,
-   "end": 33.6251
+   "start": 35.6943,
+   "end": 36.4176
   },
   {
    "word": "us",
-   "start": 33.6965,
-   "end": 34.0139
+   "start": 36.5777,
+   "end": 36.7978
   },
   {
    "word": "will",
-   "start": 34.0795,
-   "end": 34.4983
+   "start": 36.9378,
+   "end": 37.2579
   },
   {
    "word": "inherit",
-   "start": 34.5496,
-   "end": 35.1451
+   "start": 37.398,
+   "end": 37.9181
   },
   {
    "word": "whatever",
-   "start": 35.2032,
-   "end": 35.8292
+   "start": 38.0182,
+   "end": 38.6184
   },
   {
    "word": "we",
-   "start": 35.8865,
-   "end": 36.2675
+   "start": 38.7384,
+   "end": 38.8785
   },
   {
    "word": "choose",
-   "start": 36.3361,
-   "end": 36.7966
+   "start": 39.1585,
+   "end": 39.5987
   },
   {
    "word": "to",
-   "start": 36.8502,
-   "end": 37.1758
+   "start": 39.6587,
+   "end": 39.7587
   },
   {
    "word": "make",
-   "start": 37.238,
-   "end": 37.6681
+   "start": 40.0989,
+   "end": 40.479
   },
   {
    "word": "so",
-   "start": 38.2712,
-   "end": 38.6868
+   "start": 41.1192,
+   "end": 41.2392
   },
   {
    "word": "let",
-   "start": 38.7717,
-   "end": 39.1622
+   "start": 41.6194,
+   "end": 41.9395
   },
   {
    "word": "us",
-   "start": 39.2312,
-   "end": 39.5509
+   "start": 42.0995,
+   "end": 42.3196
   },
   {
    "word": "work",
-   "start": 39.6348,
-   "end": 40.0566
+   "start": 42.4996,
+   "end": 42.8398
   },
   {
    "word": "with",
-   "start": 40.1427,
-   "end": 40.5879
+   "start": 42.9998,
+   "end": 43.3799
   },
   {
    "word": "patience",
-   "start": 40.6494,
-   "end": 41.2562
+   "start": 43.46,
+   "end": 44.0602
   },
   {
    "word": "let",
-   "start": 41.6989,
-   "end": 42.0831
+   "start": 44.5603,
+   "end": 44.8604
   },
   {
    "word": "us",
-   "start": 42.1634,
-   "end": 42.4874
+   "start": 45.0205,
+   "end": 45.2605
   },
   {
    "word": "listen",
-   "start": 42.5632,
-   "end": 43.0374
+   "start": 45.4206,
+   "end": 45.8207
   },
   {
    "word": "with",
-   "start": 43.0941,
-   "end": 43.5462
+   "start": 45.9408,
+   "end": 46.3409
   },
   {
    "word": "care",
-   "start": 43.5964,
-   "end": 43.9983
+   "start": 46.4209,
+   "end": 46.8011
   },
   {
    "word": "and",
-   "start": 44.3303,
-   "end": 44.7386
+   "start": 47.2012,
+   "end": 47.5013
   },
   {
    "word": "let",
-   "start": 44.8206,
-   "end": 45.2028
+   "start": 47.6813,
+   "end": 47.9814
   },
   {
    "word": "us",
-   "start": 45.2667,
-   "end": 45.5899
+   "start": 48.1415,
+   "end": 48.3616
   },
   {
    "word": "speak",
-   "start": 45.6628,
-   "end": 46.0801
+   "start": 48.5016,
+   "end": 48.8617
   },
   {
    "word": "with",
-   "start": 46.1681,
-   "end": 46.6189
+   "start": 49.0218,
+   "end": 49.4019
   },
   {
    "word": "courage",
-   "start": 46.6903,
-   "end": 47.1983
+   "start": 49.5019,
+   "end": 50.0021
   },
   {
    "word": "the",
-   "start": 47.7351,
-   "end": 48.0327
+   "start": 50.6223,
+   "end": 50.7423
   },
   {
    "word": "future",
-   "start": 48.0933,
-   "end": 48.6163
+   "start": 50.9424,
+   "end": 51.4426
   },
   {
    "word": "is",
-   "start": 48.6971,
-   "end": 49.0673
+   "start": 51.5826,
+   "end": 51.8227
   },
   {
    "word": "not",
-   "start": 49.1129,
-   "end": 49.5506
+   "start": 51.9828,
+   "end": 52.3229
   },
   {
    "word": "a",
-   "start": 49.6307,
-   "end": 49.9635
+   "start": 52.5029,
+   "end": 52.5229
   },
   {
    "word": "place",
-   "start": 50.0297,
-   "end": 50.4985
+   "start": 52.823,
+   "end": 53.3032
   },
   {
    "word": "we",
-   "start": 50.5408,
-   "end": 50.9257
+   "start": 53.4032,
+   "end": 53.5633
   },
   {
    "word": "are",
-   "start": 50.9667,
-   "end": 51.3464
+   "start": 53.8634,
+   "end": 54.1235
   },
   {
    "word": "waiting",
-   "start": 51.3988,
-   "end": 51.9461
+   "start": 54.2635,
+   "end": 54.7437
   },
   {
    "word": "to",
-   "start": 52.0145,
-   "end": 52.3363
+   "start": 54.8237,
+   "end": 54.9437
   },
   {
    "word": "reach",
-   "start": 52.4058,
-   "end": 52.8476
+   "start": 55.3038,
+   "end": 55.644
   },
   {
    "word": "it",
-   "start": 53.2493,
-   "end": 53.7158
+   "start": 56.1241,
+   "end": 56.3042
   },
   {
    "word": "is",
-   "start": 53.8073,
-   "end": 54.4139
+   "start": 56.4642,
+   "end": 56.7243
   },
   {
    "word": "a",
-   "start": 54.5243,
-   "end": 55.0666
+   "start": 56.9044,
+   "end": 56.9244
   },
   {
    "word": "promise",
-   "start": 55.1869,
-   "end": 56.0469
+   "start": 57.2245,
+   "end": 57.7647
   },
   {
    "word": "we",
-   "start": 56.1287,
-   "end": 56.76
+   "start": 57.8647,
+   "end": 58.0247
   },
   {
    "word": "keep",
-   "start": 56.8293,
-   "end": 57.4898
+   "start": 58.2448,
+   "end": 58.5449
   },
   {
    "word": "every",
-   "start": 57.635,
-   "end": 58.4003
+   "start": 58.785,
+   "end": 59.1451
   },
   {
    "word": "single",
-   "start": 58.4706,
-   "end": 59.3726
+   "start": 59.2852,
+   "end": 59.7853
   },
   {
    "word": "day",
-   "start": 59.4648,
-   "end": 60.0346
+   "start": 59.8453,
+   "end": 60.1254
   },
   {
    "word": "let",
-   "start": 60.6599,
-   "end": 61.0501
+   "start": 60.8457,
+   "end": 61.1658
   },
   {
    "word": "us",
-   "start": 61.1057,
-   "end": 61.4234
+   "start": 61.3058,
+   "end": 61.5259
   },
   {
    "word": "begin",
-   "start": 61.5032,
-   "end": 62.0406
+   "start": 61.6459,
+   "end": 62.1261
   },
   {
    "word": "now",
-   "start": 62.1189,
-   "end": 62.5766
+   "start": 62.3061,
+   "end": 62.7063
   },
   {
    "word": "together",
-   "start": 62.9062,
-   "end": 63.4922
+   "start": 63.0464,
+   "end": 63.6066
   },
   {
    "word": "and",
-   "start": 63.888,
-   "end": 64.2992
+   "start": 64.0867,
+   "end": 64.3868
   },
   {
    "word": "let",
-   "start": 64.344,
-   "end": 64.7334
+   "start": 64.5269,
+   "end": 64.847
   },
   {
    "word": "us",
-   "start": 64.805,
-   "end": 65.1303
+   "start": 65.007,
+   "end": 65.2271
   },
   {
    "word": "not",
-   "start": 65.2105,
-   "end": 65.6404
+   "start": 65.4072,
+   "end": 65.7473
   },
   {
    "word": "stop",
-   "start": 65.7165,
-   "end": 66.1989
+   "start": 65.8873,
+   "end": 66.2474
   },
   {
    "word": "until",
-   "start": 66.2836,
-   "end": 66.8147
+   "start": 66.4475,
+   "end": 66.8676
   },
   {
    "word": "the",
-   "start": 66.856,
-   "end": 67.1514
+   "start": 67.0677,
+   "end": 67.2278
   },
   {
    "word": "work",
-   "start": 67.2021,
-   "end": 67.6306
+   "start": 67.4078,
+   "end": 67.7279
   },
   {
    "word": "is",
-   "start": 67.7178,
-   "end": 68.0877
+   "start": 67.928,
+   "end": 68.1681
   },
   {
    "word": "done",
-   "start": 68.1403,
-   "end": 68.5071
+   "start": 68.2881,
+   "end": 68.6282
   }
  ]
 }

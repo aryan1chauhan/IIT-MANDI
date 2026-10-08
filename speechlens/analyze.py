@@ -240,6 +240,8 @@ def analyze(y_p, words_p, y_b, words_b):
                              "baseline": round(len(words_b) / max(wt_b["dur"].sum(), 1e-6), 2)},
         "pause_time_s": {"participant": round(float(wt_p["gap"].sum()), 2), "baseline": round(float(wt_b["gap"].sum()), 2)},
         "f0_median_hz": {"participant": round(f_p.f0_median_hz, 1), "baseline": round(f_b.f0_median_hz, 1)},
+        "f0_bounds_hz": {"participant": [round(f_p.f0_floor_hz, 1), round(f_p.f0_ceiling_hz, 1)],
+                         "baseline": [round(f_b.f0_floor_hz, 1), round(f_b.f0_ceiling_hz, 1)]},
     }
     return {"scores": scores, "regions": regions, "global": glob, "series": series,
             "words": [{"word": w["word"], "start": round(w["start"], 3), "end": round(w["end"], 3)} for w in words_p]}

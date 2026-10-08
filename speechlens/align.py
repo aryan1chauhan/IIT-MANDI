@@ -2,14 +2,19 @@
 
 Needs: torch + torchaudio (see requirements.txt). The model (~1.2 GB) is downloaded on first use.
 """
+from functools import lru_cache
+
 from .io import load_audio
 from .text import normalize_words
 
 
-def _load_model(bundle, device="cpu"):
+@lru_cache
+def _load_model(device="cpu"):
     import torch
+    import torchaudio
     from torchaudio.pipelines._wav2vec2 import utils
 
+    bundle = torchaudio.pipelines.MMS_FA
     # Load weights with weights_only=True to prevent pickle overhead and access violations
     cached = torch.hub.load_state_dict_from_url(bundle._path, map_location="cpu", weights_only=True)
     if getattr(bundle, "_remove_aux_axis", None):
@@ -31,7 +36,7 @@ def align_words(audio_path, transcript: str, device: str = "cpu"):
     if not words:
         raise ValueError("Transcript has no alignable words")
     bundle = torchaudio.pipelines.MMS_FA
-    model = _load_model(bundle, device=device)
+    model = _load_model(device=device)
     tokenizer, aligner = bundle.get_tokenizer(), bundle.get_aligner()
     y = load_audio(audio_path, sr=int(bundle.sample_rate))
     wav = torch.from_numpy(y)[None].to(device)

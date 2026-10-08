@@ -23,6 +23,8 @@ def main():
     ap.add_argument("--realign", action="store_true", help="Realign participant audio with MMS_FA")
     ap.add_argument("--realign-baseline", action="store_true",
                     help="Realign baseline audio with MMS_FA (matched provenance)")
+    ap.add_argument("--refresh-realignments", action="store_true",
+                    help="Recompute participant MMS_FA sidecars instead of using cached alignments")
     a = ap.parse_args()
     data = Path(a.data)
     base_cache, per_file = {}, []
@@ -46,7 +48,7 @@ def main():
         fl = [p for p in (data / "flawed").glob(lab["id"] + ".*") if p.suffix.lower() in (".wav", ".mp3", ".flac")][0]
         if a.realign:
             cache_p = data / "flawed" / f"{lab['id']}.align.json"
-            if cache_p.exists():
+            if cache_p.exists() and not a.refresh_realignments:
                 wp = load_alignment(cache_p)
             else:
                 transcript = (data / "transcripts" / f"{b}.txt").read_text(encoding="utf-8")
@@ -104,7 +106,7 @@ def main():
                 fp_flagged_words += n_tot
                 fp_short_flagged_words += n_short
 
-    out = {"per_type": {}, "per_severity": {}, "iou_0.5": {}}
+    out = {"per_type": {}, "per_severity_iou_0.5": {}, "iou_0.5": {}}
     for thr in (0.3, 0.5):
         t_tp, t_fn, t_fp = defaultdict(int), defaultdict(int), defaultdict(int)
         s_tp, s_n = defaultdict(int), defaultdict(int)
@@ -119,6 +121,13 @@ def main():
                 s_n[t["severity"]] += 1
             for pi in up:
                 t_fp[res["regions"][pi]["type"]] += 1
+                if thr == 0.3 and res["regions"][pi]["type"] == "monotone":
+                    r = res["regions"][pi]
+                    out.setdefault("monotone_false_positives_iou_0.3", []).append({
+                        "file": lab["id"], "word_start": r["word_start"], "word_end": r["word_end"],
+                        "text": r["text"], "start": r["start"], "end": r["end"],
+                        "f0_bounds_hz": res["global"]["f0_bounds_hz"],
+                    })
 
         tot_tp = sum(t_tp.values())
         tot_fn = sum(t_fn.values())
@@ -140,11 +149,18 @@ def main():
             r_str = f"{r:7.2f}" if r is not None else "    n/a"
             print(f"{k:14s} {r_str} {p:10.2f} {f1:6.2f} {t_tp[k]:4d} {t_fn[k]:4d} {t_fp[k]:4d}")
 
-        if thr == 0.3:
-            print("\nRecall by severity (1 = almost perfect ... 4 = botched)")
+        if thr == 0.5:
+            print("\nRecall by severity (IoU>=0.5; 1 = almost perfect ... 4 = botched)")
             for s in sorted(s_n):
-                out["per_severity"][s] = s_tp[s] / s_n[s]
+                out["per_severity_iou_0.5"][s] = s_tp[s] / s_n[s]
                 print(f"  severity {s}: {s_tp[s] / s_n[s]:.2f}  ({s_tp[s]}/{s_n[s]})")
+
+    monotone_fps = out.get("monotone_false_positives_iou_0.3", [])
+    print(f"\nMonotone false positives (IoU>=0.3): {len(monotone_fps)}")
+    for fp_row in monotone_fps:
+        b = fp_row["f0_bounds_hz"]
+        print(f"  {fp_row['file']}: words {fp_row['word_start']}..{fp_row['word_end']} "
+              f"({fp_row['text']!r}); baseline={b['baseline']}, participant={b['participant']}")
 
     e = np.array(errs) if errs else np.zeros((0, 2))
     out["boundary_mae_s"] = {"start": float(e[:, 0].mean()) if len(e) else None,

@@ -4,12 +4,15 @@ Every flaw is applied to a span of whole words (or a word boundary for pauses), 
 injected region and the new word timings are known exactly -- no re-alignment needed.
 Severity 1..4 runs from "almost perfect" (barely perceptible) to "botched".
 """
+import io
+import subprocess
 import zlib
 
 import librosa
 import numpy as np
 import parselmouth
 from parselmouth.praat import call
+import soundfile as sf
 from scipy.signal import butter, sosfiltfilt
 
 from . import SR
@@ -68,9 +71,31 @@ def _monotone(seg, sr, k):
     return out[:len(seg)]
 
 
+def _atempo(seg, rate, sr):
+    """Change duration with ffmpeg's time-domain atempo filter, preserving pitch."""
+    if not 0.5 <= rate <= 2.0:
+        raise ValueError(f"atempo rate must be within [0.5, 2.0], got {rate}")
+    source = io.BytesIO()
+    sf.write(source, seg, sr, format="WAV", subtype="FLOAT")
+    try:
+        proc = subprocess.run(
+            ["ffmpeg", "-nostdin", "-v", "error", "-i", "pipe:0", "-filter:a", f"atempo={rate}",
+             "-ar", str(sr), "-ac", "1", "-f", "wav", "pipe:1"],
+            input=source.getvalue(), capture_output=True, check=True,
+        )
+    except FileNotFoundError as err:
+        raise RuntimeError("ffmpeg is required for rushed and dragging injection") from err
+    except subprocess.CalledProcessError as err:
+        raise RuntimeError(f"ffmpeg atempo failed: {err.stderr.decode(errors='replace').strip()}") from err
+    out, out_sr = sf.read(io.BytesIO(proc.stdout), dtype="float32")
+    if out_sr != sr or len(out) == 0:
+        raise RuntimeError("ffmpeg atempo produced invalid audio")
+    return out
+
+
 def _process(seg, flaw, param, sr):
     if flaw in ("rushed", "dragging"):
-        return librosa.effects.time_stretch(seg, rate=float(param))
+        return _atempo(seg, float(param), sr)
     if flaw == "volume_drop":
         g = 10 ** (param / 20)
         ramp = int(0.02 * sr)
@@ -110,6 +135,8 @@ def apply_flaw(y, words, flaw, severity, i, j, rng, sr=SR):
     s, e = words[i]["start"], words[j]["end"]
     a, b = int(round(s * sr)), int(round(e * sr))
     seg = y[a:b]
+    if len(seg) == 0:
+        raise ValueError(f"cannot inject {flaw} into empty word span {i}..{j}")
     seg2 = _fade(_process(seg, flaw, param, sr), int(0.005 * sr))
     scale = len(seg2) / len(seg)
     for k in range(i, j + 1):
