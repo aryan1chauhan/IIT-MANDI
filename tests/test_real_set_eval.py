@@ -63,6 +63,7 @@ def test_parse_audacity_labels(tmp_path):
     label_file = tmp_path / "take.labels.txt"
     label_file.write_text(
         "1.200\t2.500\trushed\n"
+        "\\spectral_selection_extra_line\n"
         "3.100\t4.200\tlong_pause\n"
         "# comment line\n"
         "\n"

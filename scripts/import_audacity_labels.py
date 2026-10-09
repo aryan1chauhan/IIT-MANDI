@@ -60,7 +60,7 @@ def parse_audacity_labels(label_file: Path) -> list[dict]:
     records = []
     for line_idx, line in enumerate(label_file.read_text(encoding="utf-8").splitlines(), 1):
         line = line.strip()
-        if not line or line.startswith("#"):
+        if not line or line.startswith("#") or line.startswith("\\"):
             continue
         parts = re.split(r"\t+|\s{2,}", line)
         if len(parts) < 3:
