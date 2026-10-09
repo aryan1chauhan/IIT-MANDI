@@ -25,7 +25,15 @@ def main():
                     help="Realign baseline audio with MMS_FA (matched provenance)")
     ap.add_argument("--refresh-realignments", action="store_true",
                     help="Recompute participant MMS_FA sidecars instead of using cached alignments")
+    ap.add_argument("--real", action="store_true", help="Run evaluation on real-voice dataset")
     a = ap.parse_args()
+    if a.real:
+        from eval_real import run_real_eval
+        real_data = Path("data/real") if Path("data/real").exists() else Path(a.data)
+        labels_dir = real_data / "labels" if (real_data / "labels").exists() else Path(a.data) / "labels"
+        out_path = Path("eval/real_results.json") if a.out == "eval/results.json" else Path(a.out)
+        run_real_eval(data_dir=real_data, labels_dir=labels_dir, out_path=out_path)
+        return
     data = Path(a.data)
     base_cache, per_file = {}, []
     for lab_path in sorted((data / "labels").glob("*.json")):
