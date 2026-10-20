@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpeechLens Studio — Contrastive Speech Analytics & Multi-Track Flaw Grounding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-app: #0c0e14;
+        --bg-panel: #12151e;
+        --bg-panel-elevated: #181d2a;
+        --bg-track: #0e111a;
+        --bg-track-inner: #090c12;
+        
+        --border-subtle: #1e2433;
+        --border-medium: #2a3449;
+        --border-active: #6366f1;
+        
+        --text-white: #ffffff;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        
+        --accent-indigo: #818cf8;
+        --accent-indigo-dim: rgba(129, 140, 248, 0.15);
+        --accent-cyan: #38bdf8;
+        --accent-cyan-dim: rgba(56, 189, 248, 0.15);
+        --accent-emerald: #10b981;
+        --accent-amber: #f59e0b;
+        --accent-amber-dim: rgba(245, 158, 11, 0.15);
+        --accent-rose: #f43f5e;
+        --accent-rose-dim: rgba(244, 63, 94, 0.18);
+        --accent-playhead: #f43f5e;
+        
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+        --shadow-elevation: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--bg-app);
+        color: var(--text-primary);
+        line-height: 1.45;
+        font-size: 13px;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+        padding-bottom: 90px;
+        overflow-x: hidden;
+    }
+
+    .mono { font-family: 'Geist Mono', monospace; }
+
+    /* Top Application Bar */
+    .app-header {
+        background: rgba(18, 21, 30, 0.95);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-subtle);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 10px 24px;
+    }
+    .header-content {
+        max-width: 1920px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+    .brand-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .brand-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius-sm);
+        background: linear-gradient(135deg, #6366f1, #38bdf8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+    }
+    .brand-badge svg { width: 18px; height: 18px; }
+    .brand-title {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-white);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .brand-sub {
+        font-size: 11px;
+        font-weight: 400;
+        color: var(--text-muted);
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .preset-selector-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        padding: 4px 10px;
+    }
+    .preset-selector-wrap label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .select-preset {
+        background: transparent;
+        border: none;
+        color: var(--text-white);
+        font-size: 12px;
+        font-weight: 500;
+        outline: none;
+        cursor: pointer;
+        max-width: 280px;
+    }
+    .select-preset option {
+        background: var(--bg-panel);
+        color: var(--text-white);
+    }
+
+    .btn-toggle-custom {
+        background: var(--bg-panel-elevated);
+        border: 1px solid var(--border-medium);
+        color: var(--text-secondary);
+        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.15s ease;
+    }
+    .btn-toggle-custom:hover {
+        color: var(--text-white);
+        border-color: var(--accent-indigo);
+    }
+    .btn-toggle-custom.active {
+        background: var(--accent-indigo-dim);
+        color: var(--accent-indigo);
+        border-color: var(--accent-indigo);
+    }
+
+    .btn-analyze {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #ffffff;
+        border: none;
+        padding: 7px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+        transition: all 0.15s ease;
+    }
+    .btn-analyze:hover {
+        background: linear-gradient(135deg, #4f46e5, #4338ca);
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+    .btn-analyze:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Custom Ingestion Collapsible Drawer */
+    .custom-drawer {
+        background: var(--bg-panel);
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 16px 24px;
+        display: none;
+        animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .custom-grid {
+        max-width: 1920px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr 2fr;
+        gap: 16px;
+    }
+    .input-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .input-field label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+    }
+    .file-dropzone {
+        background: var(--bg-track-inner);
+        border: 1px dashed var(--border-medium);
+        border-radius: var(--radius-sm);
+        padding: 8px 12px;
+        cursor: pointer;
+        position: relative;
+        font-size: 12px;
+        color: var(--text-secondary);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .file-dropzone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+    }
+    textarea.script-input {
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-medium);
+        color: var(--text-white);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        font-size: 12px;
+        resize: vertical;
+        min-height: 52px;
+        outline: none;
+        font-family: inherit;
+    }
+    textarea.script-input:focus { border-color: var(--accent-indigo); }
+
+    /* Studio Main Workspace */
+    .studio-shell {
+        max-width: 1920px;
+        margin: 0 auto;
+        padding: 18px 24px;
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+    }
+    @media (max-width: 1300px) {
+        .studio-shell { grid-template-columns: 1fr; }
+    }
+
+    /* Left Multi-Track DAW Timeline Workspace */
+    .daw-timeline-pane {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .timeline-toolbar {
+        background: var(--bg-panel);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 8px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .track-feature-tabs {
+        display: inline-flex;
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        padding: 2px;
+    }
+    .btn-tab {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .btn-tab.active {
+        background: var(--bg-panel-elevated);
+        color: var(--text-white);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    .timeline-legend {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 11px;
+    }
+    .legend-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--text-secondary);
+    }
+    .chip-color {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+    }
+
+    /* Stacked Track Lanes */
+    .tracks-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+    }
+
+    .track-lane {
+        background: var(--bg-track);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        position: relative;
+        transition: border-color 0.15s ease;
+    }
+    .track-lane:hover {
+        border-color: var(--border-medium);
+    }
+    .track-header {
+        padding: 8px 14px;
+        background: rgba(18, 21, 30, 0.7);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .track-badge {
+        font-family: 'Geist Mono', monospace;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .track-badge.participant {
+        background: var(--accent-indigo-dim);
+        color: #a5b4fc;
+        border: 1px solid rgba(129, 140, 248, 0.3);
+    }
+    .track-badge.baseline {
+        background: var(--accent-cyan-dim);
+        color: #7dd3fc;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .track-badge.dialogue {
+        background: rgba(16, 185, 129, 0.12);
+        color: #6ee7b7;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .track-telemetry-strip {
+        font-family: 'Geist Mono', monospace;
+        font-size: 10px;
+        color: var(--text-muted);
+        display: flex;
+        gap: 12px;
+    }
+    .track-canvas-box {
+        position: relative;
+        height: 140px;
+        background: var(--bg-track-inner);
+        cursor: crosshair;
+    }
+    .track-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    /* Global Sweeping Playhead Line */
+    .sweeping-playhead {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--accent-playhead);
+        pointer-events: none;
+        z-index: 30;
+        box-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
+        display: none;
+    }
+    .playhead-needle {
+        position: absolute;
+        top: 0;
+        left: -5px;
+        width: 12px;
+        height: 12px;
+        background: var(--accent-playhead);
+        clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+
+    /* TextGrid / Word Alignment Track */
+    .dialogue-tier-lane {
+        background: var(--bg-track);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        overflow-x: auto;
+    }
+    .dialogue-tier-words {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        line-height: 1.8;
+        font-size: 13px;
+        max-height: 110px;
+        overflow-y: auto;
+    }
+    .token-span {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .token-span:hover {
+        background: var(--accent-indigo-dim);
+        color: #ffffff;
+    }
+    .token-span.active {
+        background: var(--accent-indigo);
+        color: #ffffff;
+        box-shadow: 0 0 10px rgba(129, 140, 248, 0.5);
+    }
+    .token-span.flawed {
+        border-bottom: 2px solid var(--accent-rose);
+        background: var(--accent-rose-dim);
+        color: #fda4af;
+    }
+
+    /* Time Ruler & Minimap */
+    .time-ruler-lane {
+        height: 24px;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        position: relative;
+        cursor: pointer;
+    }
+    .ruler-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    .minimap-lane {
+        height: 36px;
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+    }
+    .minimap-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    /* Right Studio Inspector Panel */
+    .studio-inspector-pane {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .inspector-card {
+        background: var(--bg-panel);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-elevation);
+        overflow: hidden;
+    }
+    .inspector-header {
+        padding: 12px 16px;
+        background: var(--bg-panel-elevated);
+        border-bottom: 1px solid var(--border-subtle);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-white);
+    }
+    .inspector-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    /* Master Delivery Score Ring */
+    .score-summary-widget {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .dial-wrap {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        flex-shrink: 0;
+    }
+    .dial-svg {
+        width: 80px;
+        height: 80px;
+        transform: rotate(-90deg);
+    }
+    .dial-track {
+        fill: none;
+        stroke: var(--bg-track-inner);
+        stroke-width: 7;
+    }
+    .dial-fill {
+        fill: none;
+        stroke: var(--accent-indigo);
+        stroke-width: 7;
+        stroke-linecap: round;
+        stroke-dasharray: 226;
+        stroke-dashoffset: 226;
+        transition: stroke-dashoffset 0.8s ease, stroke 0.3s ease;
+    }
+    .dial-num {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Geist Mono', monospace;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-white);
+    }
+    .status-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .badge-verdict {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 4px;
+        width: fit-content;
+    }
+    .badge-verdict.pass { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-verdict.warn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-verdict.fail { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    /* Calibrated VU Meters */
+    .vu-meters-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .vu-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .vu-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+    }
+    .vu-name { color: var(--text-secondary); }
+    .vu-val { font-family: 'Geist Mono', monospace; font-weight: 600; color: var(--text-white); }
+    .vu-track {
+        height: 6px;
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-subtle);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    .vu-fill {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #38bdf8, #818cf8);
+        transition: width 0.6s ease;
+    }
+
+    /* Flaw Diagnostic Card (Active Flaw Detail) */
+    .active-flaw-box {
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .active-flaw-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .tag-flaw-type {
+        font-family: 'Geist Mono', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 4px;
+    }
+    .tag-flaw-type.rushed, .tag-flaw-type.dragging { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .tag-flaw-type.monotone, .tag-flaw-type.erratic_pitch { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+    .tag-flaw-type.long_pause, .tag-flaw-type.missing_pause { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+    .tag-flaw-type.volume_drop, .tag-flaw-type.volume_spike { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .tag-flaw-type.muffled { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+    .active-flaw-quote {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-white);
+        padding-left: 8px;
+        border-left: 2px solid var(--accent-rose);
+        font-style: italic;
+    }
+    .active-flaw-deltas {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        font-family: 'Geist Mono', monospace;
+        font-size: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 6px 8px;
+        border-radius: 4px;
+    }
+    .active-flaw-deltas .col { display: flex; flex-direction: column; }
+    .active-flaw-deltas .col .lbl { color: var(--text-muted); }
+    .active-flaw-deltas .col .val { color: var(--text-primary); font-weight: 600; }
+
+    .flaw-audition-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 4px;
+    }
+    .btn-snippet-play {
+        flex: 1;
+        background: var(--bg-panel-elevated);
+        border: 1px solid var(--border-medium);
+        color: var(--text-primary);
+        font-size: 11px;
+        font-weight: 500;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.15s ease;
+    }
+    .btn-snippet-play:hover {
+        background: var(--accent-indigo);
+        color: #ffffff;
+        border-color: var(--accent-indigo);
+    }
+    .btn-snippet-play.playing {
+        background: var(--accent-rose);
+        color: #ffffff;
+        border-color: var(--accent-rose);
+    }
+
+    /* Fixed Master DAW Transport Bar */
+    .master-transport-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 64px;
+        background: rgba(14, 17, 26, 0.96);
+        backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border-subtle);
+        z-index: 100;
+        padding: 0 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .transport-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 260px;
+    }
+    .lcd-timecode {
+        font-family: 'Geist Mono', monospace;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-white);
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-subtle);
+        padding: 6px 12px;
+        border-radius: var(--radius-sm);
+        letter-spacing: 0.05em;
+    }
+    .channel-ab-toggle {
+        display: inline-flex;
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        padding: 2px;
+    }
+    .btn-ab {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .btn-ab.active {
+        background: var(--bg-panel-elevated);
+        color: #ffffff;
+    }
+    .btn-ab.part.active { color: #a5b4fc; }
+    .btn-ab.ref.active { color: #38bdf8; }
+
+    .transport-center {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .btn-circle-play {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        border: none;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+        transition: transform 0.1s ease;
+    }
+    .btn-circle-play:hover { transform: scale(1.06); }
+    .btn-circle-play svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .btn-transport-step {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--bg-panel-elevated);
+        border: 1px solid var(--border-medium);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .btn-transport-step:hover {
+        color: var(--text-white);
+        border-color: var(--accent-indigo);
+    }
+    .btn-transport-step svg { width: 14px; height: 14px; fill: currentColor; }
+
+    .transport-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 260px;
+        justify-content: flex-end;
+    }
+    .select-speed {
+        background: var(--bg-track-inner);
+        border: 1px solid var(--border-medium);
+        color: var(--text-secondary);
+        font-size: 11px;
+        padding: 5px 8px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+    }
+
+    /* Status Notifications */
+    .status-banner {
+        padding: 10px 18px;
+        border-radius: var(--radius-md);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 24px;
+    }
+    .status-banner.loading {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #c7d2fe;
+    }
+    .status-banner.error {
+        background: rgba(244, 63, 94, 0.1);
+        border: 1px solid rgba(244, 63, 94, 0.3);
+        color: #fecdd3;
+    }
+    .loading-spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(99, 102, 241, 0.3);
+        border-top-color: var(--accent-indigo);
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Top Application Header -->
+<header class="app-header">
+    <div class="header-content">
+        <div class="brand-section">
+            <div class="brand-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12h3l2-6 4 13 3-9 2 4h4" />
+                </svg>
+            </div>
+            <div>
+                <div class="brand-title">SpeechLens Studio</div>
+                <div class="brand-sub">Contrastive Speech Analytics &amp; Multi-Track Flaw Grounding</div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <!-- Preset Selector -->
+            <div class="preset-selector-wrap">
+                <label>Evaluation Take:</label>
+                <select id="presetSelect" class="select-preset">
+                    <option value="">-- Manual File Upload --</option>
+                </select>
+            </div>
+
+            <!-- Custom Drawer Toggle -->
+            <button type="button" class="btn-toggle-custom" id="btnToggleDrawer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload Takes
+            </button>
+
+            <!-- Analyze CTA Button -->
+            <button type="button" class="btn-analyze" id="btnRunAnalysis">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Analyze Speech Take
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Custom Ingestion Drawer (Collapsible) -->
+<div class="custom-drawer" id="customDrawer">
+    <div class="custom-grid">
+        <div class="input-field">
+            <label>Participant Audio (CH-1)</label>
+            <div class="file-dropzone">
+                <input type="file" id="participantInput" accept="audio/*">
+                <span id="participantFileDisplay">Choose WAV / FLAC...</span>
+            </div>
+        </div>
+        <div class="input-field">
+            <label>Reference Baseline (CH-2)</label>
+            <div class="file-dropzone">
+                <input type="file" id="baselineInput" accept="audio/*">
+                <span id="baselineFileDisplay">Choose Baseline Audio...</span>
+            </div>
+        </div>
+        <div class="input-field">
+            <label>Anchor Script Text <span id="wordCountNotice" class="mono">0 Words</span></label>
+            <textarea id="transcriptInput" class="script-input" placeholder="Enter transcript text (numeric digits must be spelled out)..."></textarea>
+        </div>
+    </div>
+</div>
+
+<!-- Status Message Banner -->
+<div id="statusBanner" style="display: none;"></div>
+
+<!-- Main DAW Studio Layout -->
+<main class="studio-shell" id="studioWorkspace" style="display: none;">
+
+    <!-- Left Stage: Multi-Track DAW Timeline -->
+    <div class="daw-timeline-pane">
+
+        <!-- Timeline Track Toolbar -->
+        <div class="timeline-toolbar">
+            <div class="track-feature-tabs">
+                <button type="button" class="btn-tab active" data-trace="f0_st">Pitch Contour (F0)</button>
+                <button type="button" class="btn-tab" data-trace="energy_db">Loudness (dB)</button>
+                <button type="button" class="btn-tab" data-trace="hf_db">Spectral Clarity (&gt;3kHz)</button>
+            </div>
+            <div class="timeline-legend">
+                <div class="legend-chip">
+                    <span class="chip-color" style="background: var(--accent-indigo);"></span>
+                    <span>CH-1 Participant</span>
+                </div>
+                <div class="legend-chip">
+                    <span class="chip-color" style="background: var(--accent-cyan); border-top: 1px dashed #ffffff;"></span>
+                    <span>CH-2 Baseline</span>
+                </div>
+                <div class="legend-chip">
+                    <span class="chip-color" style="background: var(--accent-rose);"></span>
+                    <span>Grounded Flaw Region</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stacked Tracks Area -->
+        <div class="tracks-container" id="tracksWrapper">
+
+            <!-- Global Sweeping Playhead -->
+            <div class="sweeping-playhead" id="globalPlayhead">
+                <div class="playhead-needle"></div>
+            </div>
+
+            <!-- Track 1: Participant Speech Take -->
+            <div class="track-lane" id="trackParticipantLane">
+                <div class="track-header">
+                    <div class="track-badge participant">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/></svg>
+                        CH-1 · Participant Voice
+                    </div>
+                    <div class="track-telemetry-strip">
+                        <span>MODE: MONO 16kHz</span>
+                        <span id="ch1PeakMeter">PEAK: -1.2 dB</span>
+                    </div>
+                </div>
+                <div class="track-canvas-box" id="ch1Box">
+                    <canvas id="canvasCh1" class="track-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Track 2: Reference Baseline -->
+            <div class="track-lane" id="trackBaselineLane">
+                <div class="track-header">
+                    <div class="track-badge baseline">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                        CH-2 · Reference Baseline
+                    </div>
+                    <div class="track-telemetry-strip">
+                        <span>TARGET BENCHMARK</span>
+                        <span id="ch2PeakMeter">PEAK: -0.8 dB</span>
+                    </div>
+                </div>
+                <div class="track-canvas-box" id="ch2Box">
+                    <canvas id="canvasCh2" class="track-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Timecode Ruler -->
+            <div class="time-ruler-lane" id="timeRulerBox">
+                <canvas id="canvasRuler" class="ruler-canvas"></canvas>
+            </div>
+
+            <!-- Time-Aligned TextGrid Dialogue Tier -->
+            <div class="dialogue-tier-lane">
+                <div class="track-header" style="padding: 4px 0 8px 0; background: transparent; border: none;">
+                    <span class="track-badge dialogue">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        Time-Aligned TextGrid Dialogue Tier
+                    </span>
+                    <span style="font-size: 11px; color: var(--text-muted);">Click any word to seek</span>
+                </div>
+                <div class="dialogue-tier-words" id="dialogueWords"></div>
+            </div>
+
+            <!-- Waveform Minimap Scrubber -->
+            <div class="minimap-lane" id="minimapBox">
+                <canvas id="canvasMinimap" class="minimap-canvas"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Right Studio Inspector Panel -->
+    <aside class="studio-inspector-pane">
+
+        <!-- Active Flaw Diagnostic Card (Or Rubric Summary) -->
+        <div class="inspector-card" id="inspectorCard">
+            <div class="inspector-header">
+                <span id="inspectorTitle">Performance Rubric</span>
+                <span class="mono" id="inspectorSub" style="color: var(--text-muted); font-size: 10px;">Calibrated [0–100]</span>
+            </div>
+            <div class="inspector-body" id="inspectorBody">
+                
+                <!-- Master Score Ring View -->
+                <div id="rubricSummaryView">
+                    <div class="score-summary-widget">
+                        <div class="dial-wrap">
+                            <svg class="dial-svg" viewBox="0 0 80 80">
+                                <circle class="dial-track" cx="40" cy="40" r="34"/>
+                                <circle class="dial-fill" id="scoreDialFill" cx="40" cy="40" r="34"/>
+                            </svg>
+                            <div class="dial-num" id="masterScoreVal">--</div>
+                        </div>
+                        <div class="status-summary">
+                            <span class="badge-verdict warn" id="scoreBadge">Evaluating</span>
+                            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.4;" id="scoreExplanation">
+                                Robust MAD scoring against baseline.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5 Calibrated VU Meters -->
+                    <div class="vu-meters-list" style="margin-top: 14px;">
+                        <div class="vu-item">
+                            <div class="vu-meta"><span class="vu-name">Pace &amp; Cadence</span><span class="vu-val" id="valPace">--</span></div>
+                            <div class="vu-track"><div class="vu-fill" id="barPace"></div></div>
+                        </div>
+                        <div class="vu-item">
+                            <div class="vu-meta"><span class="vu-name">Pauses &amp; Hesitation</span><span class="vu-val" id="valPausing">--</span></div>
+                            <div class="vu-track"><div class="vu-fill" id="barPausing"></div></div>
+                        </div>
+                        <div class="vu-item">
+                            <div class="vu-meta"><span class="vu-name">Pitch Expressiveness</span><span class="vu-val" id="valPitch">--</span></div>
+                            <div class="vu-track"><div class="vu-fill" id="barPitch"></div></div>
+                        </div>
+                        <div class="vu-item">
+                            <div class="vu-meta"><span class="vu-name">Volume Dynamics</span><span class="vu-val" id="valVolume">--</span></div>
+                            <div class="vu-track"><div class="vu-fill" id="barVolume"></div></div>
+                        </div>
+                        <div class="vu-item">
+                            <div class="vu-meta"><span class="vu-name">Spectral Clarity</span><span class="vu-val" id="valClarity">--</span></div>
+                            <div class="vu-track"><div class="vu-fill" id="barClarity"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Flaw Detail View (When a flaw region is selected) -->
+                <div id="flawDetailView" style="display: none;">
+                    <div class="active-flaw-box">
+                        <div class="active-flaw-title">
+                            <span class="tag-flaw-type rushed" id="activeFlawTag">RUSHED</span>
+                            <span class="mono" style="font-size: 11px; color: var(--text-muted);" id="activeFlawDuration">2.10s</span>
+                        </div>
+                        <div class="active-flaw-quote" id="activeFlawQuote">"..."</div>
+                        <div class="active-flaw-deltas">
+                            <div class="col"><span class="lbl">OBSERVED</span><span class="val" id="flawObserved">--</span></div>
+                            <div class="col"><span class="lbl">REFERENCE</span><span class="val" id="flawReference">--</span></div>
+                            <div class="col"><span class="lbl">DELTA</span><span class="val" id="flawDelta">--</span></div>
+                            <div class="col"><span class="lbl">TOLERANCE</span><span class="val" id="flawTolerance">--</span></div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;" id="flawExplanation">--</div>
+                        <div class="flaw-audition-row">
+                            <button type="button" class="btn-snippet-play" id="btnAuditionPart">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                                Audition Part
+                            </button>
+                            <button type="button" class="btn-snippet-play" id="btnAuditionRef">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                                Audition Ref
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-toggle-custom" style="width: 100%; justify-content: center; margin-top: 10px;" id="btnBackToRubric">
+                        ← Back to Session Rubric
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Grounded Flaws Quick Jump List -->
+        <div class="inspector-card">
+            <div class="inspector-header">
+                <span>Grounded Flaw Navigator</span>
+                <span class="mono" id="flawCountIndicator" style="font-size: 10px; color: var(--text-muted);">0 Flagged</span>
+            </div>
+            <div class="inspector-body" style="padding: 10px; max-height: 220px; overflow-y: auto;" id="flawsListContainer"></div>
+        </div>
+
+    </aside>
+
+</main>
+
+<!-- Fixed Master Audio Transport Bar -->
+<footer class="master-transport-bar">
+    <div class="transport-left">
+        <div class="lcd-timecode" id="lcdTimecode">00:00.000</div>
+        <div class="channel-ab-toggle">
+            <button type="button" class="btn-ab part active" id="btnChanPart">CH-1 Part</button>
+            <button type="button" class="btn-ab ref" id="btnChanRef">CH-2 Ref</button>
+        </div>
+    </div>
+
+    <div class="transport-center">
+        <button type="button" class="btn-transport-step" id="btnPrevFlaw" title="Previous Flaw Region">
+            <svg viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <button type="button" class="btn-transport-step" id="btnRewind5" title="Rewind 5s">
+            <svg viewBox="0 0 24 24"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg>
+        </button>
+        
+        <button type="button" class="btn-circle-play" id="btnMasterPlay" title="Play / Pause (Spacebar)">
+            <svg id="iconPlay" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+            <svg id="iconPause" viewBox="0 0 24 24" style="display: none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+
+        <button type="button" class="btn-transport-step" id="btnForward5" title="Forward 5s">
+            <svg viewBox="0 0 24 24"><polygon points="13 19 22 12 13 5 13 19"/><polygon points="2 19 11 12 2 5 2 19"/></svg>
+        </button>
+        <button type="button" class="btn-transport-step" id="btnNextFlaw" title="Next Flaw Region">
+            <svg viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+    </div>
+
+    <div class="transport-right">
+        <span id="activeWordNotice" class="mono" style="font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; max-width: 140px; white-space: nowrap;">Ready</span>
+        <select class="select-speed" id="selectSpeed">
+            <option value="0.75">0.75x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="1.25">1.25x</option>
+        </select>
+    </div>
+</footer>
+
+<!-- Hidden Native Audio Elements -->
+<audio id="audioParticipant"></audio>
+<audio id="audioBaseline"></audio>
+
+<script>
+    let activeData = null;
+    let activeTrace = 'f0_st';
+    let presetsCache = {};
+    let activeChannel = 'part'; // 'part' or 'ref'
+    let selectedFlawIdx = -1;
+    let snippetTimer = null;
+
+    const audioP = document.getElementById('audioParticipant');
+    const audioB = document.getElementById('audioBaseline');
+    const playheadEl = document.getElementById('globalPlayhead');
+
+    // Startup: Fetch available presets
+    fetch('/api/presets')
+        .then(r => r.json())
+        .then(data => {
+            const select = document.getElementById('presetSelect');
+            data.presets.forEach(p => {
+                presetsCache[p.id] = p;
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.title;
+                select.appendChild(opt);
+            });
+            if (data.presets.length > 0) {
+                select.value = data.presets[0].id;
+                onPresetSelected();
+            }
+        })
+        .catch(err => console.error("Error loading presets:", err));
+
+    document.getElementById('presetSelect').onchange = onPresetSelected;
+
+    function onPresetSelected() {
+        const pid = document.getElementById('presetSelect').value;
+        if (!pid || !presetsCache[pid]) return;
+        const p = presetsCache[pid];
+        document.getElementById('transcriptInput').value = p.transcript;
+        updateWordCount();
+        document.getElementById('participantFileDisplay').textContent = pid + " (Preset Participant)";
+        document.getElementById('baselineFileDisplay').textContent = pid + " (Preset Baseline)";
+        document.getElementById('participantInput').value = '';
+        document.getElementById('baselineInput').value = '';
+    }
+
+    // Toggle Custom Audio Ingestion Drawer
+    document.getElementById('btnToggleDrawer').onclick = () => {
+        const drawer = document.getElementById('customDrawer');
+        const active = drawer.style.display === 'block';
+        drawer.style.display = active ? 'none' : 'block';
+        document.getElementById('btnToggleDrawer').classList.toggle('active', !active);
+    };
+
+    // Custom File Select
+    document.getElementById('participantInput').onchange = (e) => {
+        if (e.target.files[0]) {
+            document.getElementById('participantFileDisplay').textContent = e.target.files[0].name;
+            document.getElementById('presetSelect').value = '';
+        }
+    };
+    document.getElementById('baselineInput').onchange = (e) => {
+        if (e.target.files[0]) {
+            document.getElementById('baselineFileDisplay').textContent = e.target.files[0].name;
+            document.getElementById('presetSelect').value = '';
+        }
+    };
+    document.getElementById('transcriptInput').oninput = updateWordCount;
+
+    function updateWordCount() {
+        const text = document.getElementById('transcriptInput').value.trim();
+        const count = text ? text.split(/\s+/).length : 0;
+        document.getElementById('wordCountNotice').textContent = `${count} Words`;
+    }
+
+    // Execute Analysis
+    document.getElementById('btnRunAnalysis').onclick = async () => {
+        const btn = document.getElementById('btnRunAnalysis');
+        const banner = document.getElementById('statusBanner');
+        const presetId = document.getElementById('presetSelect').value;
+        const transcript = document.getElementById('transcriptInput').value.trim();
+        const partFile = document.getElementById('participantInput').files[0];
+        const baseFile = document.getElementById('baselineInput').files[0];
+
+        btn.disabled = true;
+        banner.style.display = 'flex';
+        banner.className = 'status-banner loading';
+        banner.innerHTML = '<div class="loading-spinner"></div><span>Running MMS-FA CTC Forced Alignment &amp; Extracting Non-Parametric Contrastive Deltas...</span>';
+
+        try {
+            let payload = { transcript: transcript };
+            if (partFile && baseFile) {
+                payload.participant_b64 = await fileToBase64(partFile);
+                payload.baseline_b64 = await fileToBase64(baseFile);
+            } else if (presetId) {
+                payload.preset_id = presetId;
+            } else {
+                throw new Error("Select an evaluation take or supply custom audio files.");
+            }
+
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const res = await response.json();
+            if (!response.ok || res.error) {
+                throw new Error(res.error || "Analysis failed");
+            }
+
+            banner.style.display = 'none';
+            renderStudioDashboard(res);
+        } catch (err) {
+            banner.className = 'status-banner error';
+            banner.innerHTML = '<span>Execution Error: ' + err.message + '</span>';
+        } finally {
+            btn.disabled = false;
+        }
+    };
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    // Render Studio Results
+    function renderStudioDashboard(data) {
+        activeData = data;
+        document.getElementById('studioWorkspace').style.display = 'grid';
+
+        if (data.audio) {
+            audioP.src = data.audio.participant_url;
+            audioB.src = data.audio.baseline_url;
+        }
+
+        // Render Score Dial & Meters
+        const scores = data.scores || {};
+        const overall = (scores.overall !== undefined) ? scores.overall : 0;
+        document.getElementById('masterScoreVal').textContent = overall.toFixed(0);
+
+        const circumference = 2 * Math.PI * 34; // 213.6
+        const offset = circumference - (overall / 100) * circumference;
+        const dialFill = document.getElementById('scoreDialFill');
+        dialFill.style.strokeDasharray = `${circumference}`;
+        dialFill.style.strokeDashoffset = `${offset}`;
+
+        const badge = document.getElementById('scoreBadge');
+        const expl = document.getElementById('scoreExplanation');
+        if (overall >= 90) {
+            dialFill.style.stroke = 'var(--accent-emerald)';
+            badge.className = 'badge-verdict pass';
+            badge.textContent = 'Commendable Delivery';
+            expl.textContent = 'Prosody and cadence match reference baseline seamlessly.';
+        } else if (overall >= 75) {
+            dialFill.style.stroke = 'var(--accent-amber)';
+            badge.className = 'badge-verdict warn';
+            badge.textContent = 'Localized Anomaly Flagged';
+            expl.textContent = 'Minor delivery friction detected in isolated phrases.';
+        } else {
+            dialFill.style.stroke = 'var(--accent-rose)';
+            badge.className = 'badge-verdict fail';
+            badge.textContent = 'Significant Deviation';
+            expl.textContent = 'Noticeable pacing, pause, or pitch anomalies detected.';
+        }
+
+        setVu('Pace', scores.pace, 'barPace', 'valPace');
+        setVu('Pausing', scores.pausing, 'barPausing', 'valPausing');
+        setVu('Pitch', scores.expressiveness, 'barPitch', 'valPitch');
+        setVu('Volume', scores.volume, 'barVolume', 'valVolume');
+        setVu('Clarity', scores.clarity, 'barClarity', 'valClarity');
+
+        // Render Dialogue Words
+        const dialogueWords = document.getElementById('dialogueWords');
+        dialogueWords.innerHTML = '';
+        const regions = data.regions || [];
+        (data.words || []).forEach((w, idx) => {
+            const span = document.createElement('span');
+            span.className = 'token-span mono';
+            span.textContent = w.word;
+            span.dataset.start = w.start;
+            span.dataset.end = w.end;
+
+            const inFlaw = regions.some(r => w.start >= r.start - 0.05 && w.end <= r.end + 0.05);
+            if (inFlaw) span.classList.add('flawed');
+
+            span.onclick = () => seekToTime(w.start, true);
+            dialogueWords.appendChild(span);
+        });
+
+        // Render Flaw Navigator Quick List
+        renderFlawList(regions);
+
+        // Draw multi-track canvases
+        drawAllTracks();
+    }
+
+    function setVu(name, val, barId, textId) {
+        val = (val !== undefined) ? val : 0;
+        document.getElementById(textId).textContent = val.toFixed(1);
+        document.getElementById(barId).style.width = `${Math.min(100, Math.max(0, val))}%`;
+    }
+
+    function renderFlawList(regions) {
+        const list = document.getElementById('flawsListContainer');
+        list.innerHTML = '';
+        document.getElementById('flawCountIndicator').textContent = `${regions.length} Flagged`;
+
+        if (regions.length === 0) {
+            list.innerHTML = '<div style="font-size: 11px; color: var(--accent-emerald); padding: 8px;">✓ 100% Conformance (Zero Flaws Detected)</div>';
+            return;
+        }
+
+        regions.forEach((r, idx) => {
+            const item = document.createElement('div');
+            item.style.padding = '8px 10px';
+            item.style.borderRadius = '4px';
+            item.style.cursor = 'pointer';
+            item.style.background = (idx === selectedFlawIdx) ? 'rgba(244, 63, 94, 0.15)' : 'rgba(255, 255, 255, 0.02)';
+            item.style.marginBottom = '6px';
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+
+            item.innerHTML = `
+                <div>
+                    <span class="tag-flaw-type ${r.type}">${r.type.replace('_', ' ')}</span>
+                    <span style="font-size: 11px; color: var(--text-white); margin-left: 6px;">${r.start.toFixed(2)}s</span>
+                </div>
+                <span class="mono" style="font-size: 10px; color: var(--text-muted);">${(r.end - r.start).toFixed(2)}s</span>
+            `;
+
+            item.onclick = () => selectFlaw(idx);
+            list.appendChild(item);
+        });
+    }
+
+    function selectFlaw(idx) {
+        if (!activeData || !activeData.regions || !activeData.regions[idx]) return;
+        selectedFlawIdx = idx;
+        const r = activeData.regions[idx];
+
+        // Switch Right Panel to Flaw View
+        document.getElementById('rubricSummaryView').style.display = 'none';
+        document.getElementById('flawDetailView').style.display = 'block';
+        document.getElementById('inspectorTitle').textContent = `Flaw #${idx + 1}: ${r.type.replace('_', ' ').toUpperCase()}`;
+
+        document.getElementById('activeFlawTag').className = `tag-flaw-type ${r.type}`;
+        document.getElementById('activeFlawTag').textContent = r.type.replace('_', ' ');
+        document.getElementById('activeFlawDuration').textContent = `Δt = ${(r.end - r.start).toFixed(2)}s`;
+        document.getElementById('activeFlawQuote').textContent = `"${r.text || '...'}"`;
+
+        document.getElementById('flawObserved').textContent = `${r.observed.toFixed(2)} ${r.unit}`;
+        document.getElementById('flawReference').textContent = `${r.reference.toFixed(2)} ${r.unit}`;
+        document.getElementById('flawDelta').textContent = `${r.delta >= 0 ? '+' : ''}${r.delta.toFixed(2)} ${r.unit}`;
+        document.getElementById('flawTolerance').textContent = `${r.magnitude.toFixed(1)}x thr`;
+        document.getElementById('flawExplanation').textContent = r.explanation;
+
+        // Audition button actions
+        document.getElementById('btnAuditionPart').onclick = () => auditionFlaw('part', r.start, r.end);
+        document.getElementById('btnAuditionRef').onclick = () => auditionFlaw('ref', r.base_start || r.start, r.base_end || r.end);
+
+        // Seek timeline and re-render list highlight
+        seekToTime(r.start, false);
+        renderFlawList(activeData.regions);
+    }
+
+    document.getElementById('btnBackToRubric').onclick = () => {
+        selectedFlawIdx = -1;
+        document.getElementById('rubricSummaryView').style.display = 'block';
+        document.getElementById('flawDetailView').style.display = 'none';
+        document.getElementById('inspectorTitle').textContent = 'Performance Rubric';
+        renderFlawList(activeData.regions);
+    };
+
+    // Step Flaw Buttons
+    document.getElementById('btnPrevFlaw').onclick = () => {
+        if (!activeData || !activeData.regions || activeData.regions.length === 0) return;
+        let nextIdx = (selectedFlawIdx <= 0) ? activeData.regions.length - 1 : selectedFlawIdx - 1;
+        selectFlaw(nextIdx);
+    };
+    document.getElementById('btnNextFlaw').onclick = () => {
+        if (!activeData || !activeData.regions || activeData.regions.length === 0) return;
+        let nextIdx = (selectedFlawIdx >= activeData.regions.length - 1) ? 0 : selectedFlawIdx + 1;
+        selectFlaw(nextIdx);
+    };
+
+    // Trace Feature Tabs
+    document.querySelectorAll('.btn-tab').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeTrace = btn.dataset.trace;
+            drawAllTracks();
+        };
+    });
+
+    // Multi-Track Canvas Drawing
+    function drawAllTracks() {
+        if (!activeData || !activeData.series) return;
+        drawTrackLane('canvasCh1', 'participant', '#818cf8', 'rgba(129, 140, 248, 0.25)', true);
+        drawTrackLane('canvasCh2', 'baseline', '#38bdf8', 'rgba(56, 189, 248, 0.20)', false);
+        drawRuler();
+        drawMinimap();
+    }
+
+    function drawTrackLane(canvasId, role, strokeColor, fillColor, showFlaws) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = rect.height;
+        const padL = 40, padR = 20, padT = 12, padB = 16;
+        const plotW = W - padL - padR;
+        const plotH = H - padT - padB;
+
+        ctx.clearRect(0, 0, W, H);
+
+        const series = activeData.series;
+        const times = series.t;
+        const vals = series[role][activeTrace];
+        if (!times || times.length === 0) return;
+
+        const tMin = 0;
+        const tMax = times[times.length - 1];
+
+        // Bounds
+        const allP = series.participant[activeTrace];
+        const allB = series.baseline[activeTrace];
+        let validVals = [...allP, ...allB].filter(v => v !== null && isFinite(v));
+        if (validVals.length === 0) validVals = [-5, 5];
+        let yMin = Math.min(...validVals);
+        let yMax = Math.max(...validVals);
+        const yMargin = (yMax - yMin) * 0.15 || 1;
+        yMin -= yMargin;
+        yMax += yMargin;
+
+        const xToPx = t => padL + (t - tMin) / (tMax - tMin) * plotW;
+        const yToPx = v => padT + (1 - (v - yMin) / (yMax - yMin)) * plotH;
+
+        // Grid lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 3; i++) {
+            const y = padT + (plotH / 3) * i;
+            ctx.beginPath();
+            ctx.moveTo(padL, y); ctx.lineTo(W - padR, y);
+            ctx.stroke();
+
+            const v = yMax - (i / 3) * (yMax - yMin);
+            ctx.fillStyle = '#64748b';
+            ctx.font = '9px Geist Mono';
+            ctx.textAlign = 'right';
+            ctx.fillText(v.toFixed(1), padL - 6, y + 3);
+        }
+
+        // Flaw Highlight Selection Boxes (Track 1)
+        if (showFlaws) {
+            (activeData.regions || []).forEach((r, idx) => {
+                const rx1 = Math.max(padL, xToPx(r.start));
+                const rx2 = Math.min(W - padR, xToPx(r.end));
+                const isSelected = (idx === selectedFlawIdx);
+
+                if (rx2 > rx1) {
+                    ctx.fillStyle = isSelected ? 'rgba(244, 63, 94, 0.22)' : 'rgba(244, 63, 94, 0.12)';
+                    ctx.fillRect(rx1, padT, rx2 - rx1, plotH);
+
+                    ctx.strokeStyle = isSelected ? '#f43f5e' : 'rgba(244, 63, 94, 0.6)';
+                    ctx.lineWidth = isSelected ? 2 : 1.2;
+                    ctx.strokeRect(rx1, padT, rx2 - rx1, plotH);
+
+                    // Selection box pill badge
+                    ctx.fillStyle = isSelected ? '#f43f5e' : 'rgba(244, 63, 94, 0.85)';
+                    ctx.fillRect(rx1, padT, Math.min(rx2 - rx1, 64), 14);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '8px Geist Mono';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(r.type.replace('_', ' ').toUpperCase().substring(0, 8), rx1 + 4, padT + 10);
+                }
+            });
+        }
+
+        // Gradient underfill
+        const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+        grad.addColorStop(0, fillColor);
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        let firstX = null, lastX = null;
+        for (let i = 0; i < times.length; i++) {
+            const v = vals[i];
+            if (v === null || !isFinite(v)) continue;
+            const x = xToPx(times[i]);
+            const y = yToPx(v);
+            if (firstX === null) {
+                firstX = x;
+                ctx.moveTo(x, padT + plotH);
+                ctx.lineTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+            lastX = x;
+        }
+        if (lastX !== null) {
+            ctx.lineTo(lastX, padT + plotH);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Main curve stroke
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 2.0;
+        if (role === 'baseline') {
+            ctx.setLineDash([4, 4]);
+        }
+        ctx.beginPath();
+        let inPath = false;
+        for (let i = 0; i < times.length; i++) {
+            const v = vals[i];
+            if (v === null || !isFinite(v)) { inPath = false; continue; }
+            const x = xToPx(times[i]);
+            const y = yToPx(v);
+            if (!inPath) { ctx.moveTo(x, y); inPath = true; }
+            else { ctx.lineTo(x, y); }
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function drawRuler() {
+        const canvas = document.getElementById('canvasRuler');
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = rect.height;
+        const padL = 40, padR = 20;
+        const plotW = W - padL - padR;
+
+        ctx.clearRect(0, 0, W, H);
+        if (!activeData?.series?.t) return;
+        const tMax = activeData.series.t[activeData.series.t.length - 1];
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px Geist Mono';
+        ctx.textAlign = 'center';
+
+        const step = Math.max(5, Math.floor(tMax / 8));
+        for (let t = 0; t <= tMax; t += step) {
+            const x = padL + (t / tMax) * plotW;
+            ctx.beginPath();
+            ctx.moveTo(x, 0); ctx.lineTo(x, 6);
+            ctx.stroke();
+            ctx.fillText(formatRulerTime(t), x, H - 4);
+        }
+    }
+
+    function drawMinimap() {
+        const canvas = document.getElementById('canvasMinimap');
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = rect.height;
+        ctx.clearRect(0, 0, W, H);
+
+        if (!activeData?.series?.participant?.energy_db) return;
+        const pEnergy = activeData.series.participant.energy_db;
+        const n = pEnergy.length;
+
+        ctx.fillStyle = 'rgba(129, 140, 248, 0.4)';
+        const barW = Math.max(1, W / n);
+        for (let i = 0; i < n; i++) {
+            const val = pEnergy[i];
+            if (val === null || !isFinite(val)) continue;
+            const barH = Math.max(2, (val + 60) / 60 * H);
+            ctx.fillRect(i * barW, (H - barH) / 2, barW - 0.5, barH);
+        }
+    }
+
+    function formatRulerTime(sec) {
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    // Audio Transport Engine
+    const currentAudio = () => (activeChannel === 'part') ? audioP : audioB;
+
+    document.getElementById('btnMasterPlay').onclick = togglePlay;
+
+    // Global Spacebar Key listener
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            togglePlay();
+        }
+    });
+
+    function togglePlay() {
+        if (snippetTimer) { clearInterval(snippetTimer); snippetTimer = null; }
+        const aud = currentAudio();
+        if (aud.paused) {
+            aud.play().catch(e => console.log(e));
+        } else {
+            aud.pause();
+        }
+        updatePlayIcons();
+    }
+
+    function updatePlayIcons() {
+        const aud = currentAudio();
+        const playing = !aud.paused;
+        document.getElementById('iconPlay').style.display = playing ? 'none' : 'block';
+        document.getElementById('iconPause').style.display = playing ? 'block' : 'none';
+    }
+
+    // Channel Switcher A/B
+    document.getElementById('btnChanPart').onclick = () => switchChannel('part');
+    document.getElementById('btnChanRef').onclick = () => switchChannel('ref');
+
+    function switchChannel(channel) {
+        if (activeChannel === channel) return;
+        const curTime = currentAudio().currentTime;
+        const wasPlaying = !currentAudio().paused;
+
+        currentAudio().pause();
+        activeChannel = channel;
+
+        document.getElementById('btnChanPart').classList.toggle('active', channel === 'part');
+        document.getElementById('btnChanRef').classList.toggle('active', channel === 'ref');
+
+        const newAud = currentAudio();
+        newAud.currentTime = curTime;
+        if (wasPlaying) newAud.play().catch(e => console.log(e));
+        updatePlayIcons();
+    }
+
+    // Seek Helper
+    function seekToTime(sec, autoPlay) {
+        if (snippetTimer) { clearInterval(snippetTimer); snippetTimer = null; }
+        const aud = currentAudio();
+        aud.currentTime = sec;
+        if (autoPlay && aud.paused) aud.play().catch(e => console.log(e));
+        updatePlayIcons();
+        updateTimeDisplay(sec);
+    }
+
+    document.getElementById('btnRewind5').onclick = () => seekToTime(Math.max(0, currentAudio().currentTime - 5), false);
+    document.getElementById('btnForward5').onclick = () => seekToTime(currentAudio().currentTime + 5, false);
+
+    // Speed Selector
+    document.getElementById('selectSpeed').onchange = (e) => {
+        const spd = parseFloat(e.target.value);
+        audioP.playbackRate = spd;
+        audioB.playbackRate = spd;
+    };
+
+    // Audition Snippet
+    function auditionFlaw(channel, start, end) {
+        if (snippetTimer) clearInterval(snippetTimer);
+        audioP.pause();
+        audioB.pause();
+
+        const aud = (channel === 'part') ? audioP : audioB;
+        if (activeChannel !== channel) {
+            activeChannel = channel;
+            document.getElementById('btnChanPart').classList.toggle('active', channel === 'part');
+            document.getElementById('btnChanRef').classList.toggle('active', channel === 'ref');
+        }
+
+        aud.currentTime = Math.max(0, start - 0.15);
+        aud.play().catch(e => console.log(e));
+        updatePlayIcons();
+
+        const btn = (channel === 'part') ? document.getElementById('btnAuditionPart') : document.getElementById('btnAuditionRef');
+        btn.classList.add('playing');
+
+        snippetTimer = setInterval(() => {
+            if (aud.currentTime >= end + 0.25 || aud.paused) {
+                aud.pause();
+                clearInterval(snippetTimer);
+                snippetTimer = null;
+                btn.classList.remove('playing');
+                updatePlayIcons();
+            }
+        }, 40);
+    }
+
+    // Live Playhead & Text Updates
+    function onAudioTick(aud) {
+        if (aud !== currentAudio()) return;
+        const cur = aud.currentTime;
+        updateTimeDisplay(cur);
+
+        // Highlight spoken word
+        const words = document.querySelectorAll('.token-span');
+        let currentWordText = '';
+        words.forEach(w => {
+            const s = parseFloat(w.dataset.start);
+            const e = parseFloat(w.dataset.end);
+            if (cur >= s && cur <= e) {
+                w.classList.add('active');
+                currentWordText = w.textContent;
+            } else {
+                w.classList.remove('active');
+            }
+        });
+        if (currentWordText) {
+            document.getElementById('activeWordNotice').textContent = `Spoken: "${currentWordText}"`;
+        }
+    }
+
+    function updateTimeDisplay(sec) {
+        document.getElementById('lcdTimecode').textContent = formatMilliTime(sec);
+
+        // Update sweeping playhead position
+        if (activeData?.series?.t) {
+            const tMax = activeData.series.t[activeData.series.t.length - 1];
+            const tracksWrapper = document.getElementById('tracksWrapper');
+            const rect = tracksWrapper.getBoundingClientRect();
+            const padL = 40, padR = 20;
+            const plotW = rect.width - padL - padR;
+
+            const px = padL + Math.max(0, Math.min(1, sec / tMax)) * plotW;
+            playheadEl.style.display = 'block';
+            playheadEl.style.left = `${px}px`;
+        }
+    }
+
+    function formatMilliTime(sec) {
+        if (isNaN(sec) || !isFinite(sec)) return '00:00.000';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        const ms = Math.floor((sec % 1) * 1000);
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(3, '0')}`;
+    }
+
+    audioP.addEventListener('timeupdate', () => onAudioTick(audioP));
+    audioB.addEventListener('timeupdate', () => onAudioTick(audioB));
+    audioP.addEventListener('ended', updatePlayIcons);
+    audioB.addEventListener('ended', updatePlayIcons);
+
+    // Click on track or ruler to seek
+    ['ch1Box', 'ch2Box', 'timeRulerBox', 'minimapBox'].forEach(boxId => {
+        document.getElementById(boxId).onclick = (e) => {
+            if (!activeData?.series?.t) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const padL = (boxId === 'minimapBox') ? 0 : 40;
+            const padR = (boxId === 'minimapBox') ? 0 : 20;
+            const plotW = rect.width - padL - padR;
+            const clickX = e.clientX - rect.left - padL;
+
+            const tMax = activeData.series.t[activeData.series.t.length - 1];
+            const clickedT = Math.max(0, Math.min(tMax, (clickX / plotW) * tMax));
+            seekToTime(clickedT, false);
+        };
+    });
+
+    window.addEventListener('resize', drawAllTracks);
+</script>
+
+</body>
+</html>

@@ -4,8 +4,15 @@ import re
 
 def normalize_words(text: str) -> list[str]:
     """Lowercase a-z/apostrophe tokens. Numbers must be spelled out in the transcript."""
-    text = text.lower().replace("\u2019", "'")
-    return re.findall(r"[a-z']+", text)
+    digits = re.findall(r"\d+", text)
+    if digits:
+        raise ValueError(
+            f"Transcript contains digits ({digits[:3]}): numbers must be spelled out (e.g. 'twenty' not '20') for forced alignment."
+        )
+    text = text.lower().replace("\u2019", "'").replace("\u2018", "'").replace("`", "'")
+    tokens = re.findall(r"[a-z']+", text)
+    cleaned = [t.strip("'") for t in tokens]
+    return [t for t in cleaned if t]
 
 
 def save_alignment(path, words):

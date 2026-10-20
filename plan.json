@@ -1,0 +1,27 @@
+{
+  "projectId": "proj_speechlens_local",
+  "type": "frontend",
+  "name": "User uploads audio and receives speech analysis metrics",
+  "planSteps": [
+    {
+      "type": "action",
+      "description": "Open http://localhost:3000/ and verify the SpeechLens analysis interface is visible"
+    },
+    {
+      "type": "action",
+      "description": "Select the 'Synthetic: Rushed Delivery (Severity 4)' preset from the dropdown and click 'Load Preset'"
+    },
+    {
+      "type": "action",
+      "description": "Click the 'Run Analysis' button"
+    },
+    {
+      "type": "assertion",
+      "description": "Verify that scoreOverall displays '79.4' and scorePace displays '65.7'"
+    },
+    {
+      "type": "assertion",
+      "description": "Verify that the time-series canvas and grounded flaw region cards are displayed"
+    }
+  ]
+}

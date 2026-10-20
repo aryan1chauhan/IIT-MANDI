@@ -40,9 +40,23 @@ Thumbs.db
 .planning/
 AGENTS.md
 GEMINI.md
+.agents/
 speechlens_data.zip
 scripts/dump_identity_words.py
 eval/results_shared_bounds_rejected.json
 data/alignments/*espeak*.json
+# TestSprite failure artifacts & config
+.testsprite/
 
+# Internal planning docs (not for public repo)
+docs/DEMO_VIDEO_SCRIPT.md
+docs/testsprite_loop_engineering.md
 
+# Generated report artifacts (regenerable from pipeline)
+report.json
+report_monotone.json
+
+# Real eval intermediate data (dev-only, regenerable)
+data/real/alignments/
+data/real/labels/
+eval/real_results.json
