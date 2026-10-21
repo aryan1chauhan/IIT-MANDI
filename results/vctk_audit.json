@@ -1,0 +1,540 @@
+{
+  "title": "VCTK Natural-Speech Cross-Speaker Control Audit",
+  "protocol": "natural-speech, cross-speaker audit (no deliberate flaws; not accuracy or F1)",
+  "summary_claims": [
+    "No rate, pitch, volume or clarity flags on 8 comparisons.",
+    "Pause flags at utterance boundaries on 3 of 4 clips; the aligned gap exceeds the acoustic silence by 1.2 to 1.9 s at every boundary, cause not yet determined."
+  ],
+  "thresholds_frozen": {
+    "K_MAD": 3.0,
+    "FLOORS": {
+      "rate": 0.3,
+      "pause": 0.35,
+      "pitch": 0.3,
+      "energy": 5.0,
+      "clarity": 4.0
+    }
+  },
+  "boundary_silence_diagnostic": {
+    "records": [
+      {
+        "boundary": "001 -> 002",
+        "prev_utterance": "001",
+        "next_utterance": "002",
+        "prev_word": "stella",
+        "next_word": "ask",
+        "speaker": "p225",
+        "source_prev_trail_s": 0.14,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.67,
+        "aligned_gap_s": 1.841
+      },
+      {
+        "boundary": "001 -> 002",
+        "prev_utterance": "001",
+        "next_utterance": "002",
+        "prev_word": "stella",
+        "next_word": "ask",
+        "speaker": "p226",
+        "source_prev_trail_s": 0.04,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.44,
+        "aligned_gap_s": 2.201
+      },
+      {
+        "boundary": "001 -> 002",
+        "prev_utterance": "001",
+        "next_utterance": "002",
+        "prev_word": "stella",
+        "next_word": "ask",
+        "speaker": "p227",
+        "source_prev_trail_s": 0.12,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.3,
+        "aligned_gap_s": 2.581
+      },
+      {
+        "boundary": "001 -> 002",
+        "prev_utterance": "001",
+        "next_utterance": "002",
+        "prev_word": "stella",
+        "next_word": "ask",
+        "speaker": "p228",
+        "source_prev_trail_s": 0.0,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 1.861
+      },
+      {
+        "boundary": "001 -> 002",
+        "prev_utterance": "001",
+        "next_utterance": "002",
+        "prev_word": "stella",
+        "next_word": "ask",
+        "speaker": "p229",
+        "source_prev_trail_s": 0.0,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 1.521
+      },
+      {
+        "boundary": "002 -> 003",
+        "prev_utterance": "002",
+        "next_utterance": "003",
+        "prev_word": "store",
+        "next_word": "six",
+        "speaker": "p225",
+        "source_prev_trail_s": 0.0,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.35,
+        "aligned_gap_s": 1.921
+      },
+      {
+        "boundary": "002 -> 003",
+        "prev_utterance": "002",
+        "next_utterance": "003",
+        "prev_word": "store",
+        "next_word": "six",
+        "speaker": "p226",
+        "source_prev_trail_s": 0.62,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.24,
+        "aligned_gap_s": 1.921
+      },
+      {
+        "boundary": "002 -> 003",
+        "prev_utterance": "002",
+        "next_utterance": "003",
+        "prev_word": "store",
+        "next_word": "six",
+        "speaker": "p227",
+        "source_prev_trail_s": 0.21,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 1.8
+      },
+      {
+        "boundary": "002 -> 003",
+        "prev_utterance": "002",
+        "next_utterance": "003",
+        "prev_word": "store",
+        "next_word": "six",
+        "speaker": "p228",
+        "source_prev_trail_s": 0.0,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.05,
+        "aligned_gap_s": 2.642
+      },
+      {
+        "boundary": "002 -> 003",
+        "prev_utterance": "002",
+        "next_utterance": "003",
+        "prev_word": "store",
+        "next_word": "six",
+        "speaker": "p229",
+        "source_prev_trail_s": 0.12,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.15,
+        "aligned_gap_s": 1.741
+      },
+      {
+        "boundary": "003 -> 004",
+        "prev_utterance": "003",
+        "next_utterance": "004",
+        "prev_word": "bob",
+        "next_word": "we",
+        "speaker": "p225",
+        "source_prev_trail_s": 0.57,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 2.081
+      },
+      {
+        "boundary": "003 -> 004",
+        "prev_utterance": "003",
+        "next_utterance": "004",
+        "prev_word": "bob",
+        "next_word": "we",
+        "speaker": "p226",
+        "source_prev_trail_s": 0.01,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.31,
+        "aligned_gap_s": 1.721
+      },
+      {
+        "boundary": "003 -> 004",
+        "prev_utterance": "003",
+        "next_utterance": "004",
+        "prev_word": "bob",
+        "next_word": "we",
+        "speaker": "p227",
+        "source_prev_trail_s": 0.02,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 1.9
+      },
+      {
+        "boundary": "003 -> 004",
+        "prev_utterance": "003",
+        "next_utterance": "004",
+        "prev_word": "bob",
+        "next_word": "we",
+        "speaker": "p228",
+        "source_prev_trail_s": 0.02,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 2.341
+      },
+      {
+        "boundary": "003 -> 004",
+        "prev_utterance": "003",
+        "next_utterance": "004",
+        "prev_word": "bob",
+        "next_word": "we",
+        "speaker": "p229",
+        "source_prev_trail_s": 0.01,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 1.621
+      },
+      {
+        "boundary": "004 -> 005",
+        "prev_utterance": "004",
+        "next_utterance": "005",
+        "prev_word": "kids",
+        "next_word": "she",
+        "speaker": "p225",
+        "source_prev_trail_s": 0.06,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 1.521
+      },
+      {
+        "boundary": "004 -> 005",
+        "prev_utterance": "004",
+        "next_utterance": "005",
+        "prev_word": "kids",
+        "next_word": "she",
+        "speaker": "p226",
+        "source_prev_trail_s": 0.43,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.01,
+        "aligned_gap_s": 2.382
+      },
+      {
+        "boundary": "004 -> 005",
+        "prev_utterance": "004",
+        "next_utterance": "005",
+        "prev_word": "kids",
+        "next_word": "she",
+        "speaker": "p227",
+        "source_prev_trail_s": 0.0,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 1.56
+      },
+      {
+        "boundary": "004 -> 005",
+        "prev_utterance": "004",
+        "next_utterance": "005",
+        "prev_word": "kids",
+        "next_word": "she",
+        "speaker": "p228",
+        "source_prev_trail_s": 0.0,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.0,
+        "aligned_gap_s": 2.001
+      },
+      {
+        "boundary": "004 -> 005",
+        "prev_utterance": "004",
+        "next_utterance": "005",
+        "prev_word": "kids",
+        "next_word": "she",
+        "speaker": "p229",
+        "source_prev_trail_s": 0.04,
+        "concat_synthetic_gap_s": 0.3,
+        "source_next_lead_s": 0.05,
+        "aligned_gap_s": 1.481
+      }
+    ],
+    "boundary_variation": {
+      "001 -> 002": {
+        "min_speaker": "p229",
+        "min_gap_s": 1.521,
+        "max_speaker": "p227",
+        "max_gap_s": 2.581,
+        "diff_s": 1.059,
+        "exceeds_0.35s_threshold": true
+      },
+      "002 -> 003": {
+        "min_speaker": "p229",
+        "min_gap_s": 1.741,
+        "max_speaker": "p228",
+        "max_gap_s": 2.642,
+        "diff_s": 0.9,
+        "exceeds_0.35s_threshold": true
+      },
+      "003 -> 004": {
+        "min_speaker": "p229",
+        "min_gap_s": 1.621,
+        "max_speaker": "p228",
+        "max_gap_s": 2.341,
+        "diff_s": 0.72,
+        "exceeds_0.35s_threshold": true
+      },
+      "004 -> 005": {
+        "min_speaker": "p229",
+        "min_gap_s": 1.481,
+        "max_speaker": "p226",
+        "max_gap_s": 2.382,
+        "diff_s": 0.9,
+        "exceeds_0.35s_threshold": true
+      }
+    }
+  },
+  "run_p225_baseline": {
+    "baseline_speaker": "p225",
+    "test_speakers": [
+      "p226",
+      "p227",
+      "p228",
+      "p229"
+    ],
+    "speaker_summaries": {
+      "p226": {
+        "score": 64.0,
+        "clip_duration_s": 30.14,
+        "flag_count": 1,
+        "flagged_duration_s": 2.381599999999999,
+        "flagged_fraction": 0.07901791639017912,
+        "flaw_types": [
+          "long_pause"
+        ]
+      },
+      "p227": {
+        "score": 65.8,
+        "clip_duration_s": 30.7061875,
+        "flag_count": 1,
+        "flagged_duration_s": 2.5805999999999996,
+        "flagged_fraction": 0.08404169355117758,
+        "flaw_types": [
+          "long_pause"
+        ]
+      },
+      "p228": {
+        "score": 56.0,
+        "clip_duration_s": 32.041125,
+        "flag_count": 2,
+        "flagged_duration_s": 4.643,
+        "flagged_fraction": 0.1449075211934662,
+        "flaw_types": [
+          "long_pause",
+          "long_pause"
+        ]
+      },
+      "p229": {
+        "score": 100.0,
+        "clip_duration_s": 24.56025,
+        "flag_count": 0,
+        "flagged_duration_s": 0,
+        "flagged_fraction": 0.0,
+        "flaw_types": []
+      }
+    },
+    "flaw_type_counts": {
+      "long_pause": 4
+    },
+    "total_test_duration_s": 117.45,
+    "total_flagged_duration_s": 9.61,
+    "total_flagged_fraction": 0.0818,
+    "detailed_flags": [
+      {
+        "baseline_speaker": "p225",
+        "test_speaker": "p226",
+        "flaw_type": "long_pause",
+        "start_s": 20.974,
+        "end_s": 23.355,
+        "duration_s": 2.382,
+        "utterance": "005",
+        "words_spanned": "she",
+        "observed": 2.382,
+        "reference": 1.521,
+        "threshold": 0.35,
+        "delta": 0.841,
+        "unit": "s",
+        "metric": "silence before word"
+      },
+      {
+        "baseline_speaker": "p225",
+        "test_speaker": "p227",
+        "flaw_type": "long_pause",
+        "start_s": 2.16,
+        "end_s": 4.741,
+        "duration_s": 2.581,
+        "utterance": "002",
+        "words_spanned": "ask",
+        "observed": 2.581,
+        "reference": 1.841,
+        "threshold": 0.35,
+        "delta": 0.7,
+        "unit": "s",
+        "metric": "silence before word"
+      },
+      {
+        "baseline_speaker": "p225",
+        "test_speaker": "p228",
+        "flaw_type": "long_pause",
+        "start_s": 6.484,
+        "end_s": 9.126,
+        "duration_s": 2.642,
+        "utterance": "003",
+        "words_spanned": "six",
+        "observed": 2.642,
+        "reference": 1.921,
+        "threshold": 0.35,
+        "delta": 0.701,
+        "unit": "s",
+        "metric": "silence before word"
+      },
+      {
+        "baseline_speaker": "p225",
+        "test_speaker": "p228",
+        "flaw_type": "long_pause",
+        "start_s": 23.495,
+        "end_s": 25.497,
+        "duration_s": 2.001,
+        "utterance": "005",
+        "words_spanned": "she",
+        "observed": 2.001,
+        "reference": 1.521,
+        "threshold": 0.35,
+        "delta": 0.46,
+        "unit": "s",
+        "metric": "silence before word"
+      }
+    ]
+  },
+  "run_p226_baseline": {
+    "baseline_speaker": "p226",
+    "test_speakers": [
+      "p225",
+      "p227",
+      "p228",
+      "p229"
+    ],
+    "speaker_summaries": {
+      "p225": {
+        "score": 82.4,
+        "clip_duration_s": 25.5124375,
+        "flag_count": 1,
+        "flagged_duration_s": 2.0809999999999995,
+        "flagged_fraction": 0.08156805871645935,
+        "flaw_types": [
+          "long_pause"
+        ]
+      },
+      "p227": {
+        "score": 79.1,
+        "clip_duration_s": 30.7061875,
+        "flag_count": 1,
+        "flagged_duration_s": 2.5805999999999996,
+        "flagged_fraction": 0.08404169355117758,
+        "flaw_types": [
+          "long_pause"
+        ]
+      },
+      "p228": {
+        "score": 55.7,
+        "clip_duration_s": 32.041125,
+        "flag_count": 2,
+        "flagged_duration_s": 4.983199999999999,
+        "flagged_fraction": 0.1555251259124016,
+        "flaw_types": [
+          "long_pause",
+          "long_pause"
+        ]
+      },
+      "p229": {
+        "score": 100.0,
+        "clip_duration_s": 24.56025,
+        "flag_count": 0,
+        "flagged_duration_s": 0,
+        "flagged_fraction": 0.0,
+        "flaw_types": []
+      }
+    },
+    "flaw_type_counts": {
+      "long_pause": 4
+    },
+    "total_test_duration_s": 112.82,
+    "total_flagged_duration_s": 9.64,
+    "total_flagged_fraction": 0.0855,
+    "detailed_flags": [
+      {
+        "baseline_speaker": "p226",
+        "test_speaker": "p225",
+        "flaw_type": "long_pause",
+        "start_s": 13.347,
+        "end_s": 15.428,
+        "duration_s": 2.081,
+        "utterance": "004",
+        "words_spanned": "we",
+        "observed": 2.081,
+        "reference": 1.721,
+        "threshold": 0.35,
+        "delta": 0.38,
+        "unit": "s",
+        "metric": "silence before word"
+      },
+      {
+        "baseline_speaker": "p226",
+        "test_speaker": "p227",
+        "flaw_type": "long_pause",
+        "start_s": 2.16,
+        "end_s": 4.741,
+        "duration_s": 2.581,
+        "utterance": "002",
+        "words_spanned": "ask",
+        "observed": 2.581,
+        "reference": 2.201,
+        "threshold": 0.35,
+        "delta": 0.379,
+        "unit": "s",
+        "metric": "silence before word"
+      },
+      {
+        "baseline_speaker": "p226",
+        "test_speaker": "p228",
+        "flaw_type": "long_pause",
+        "start_s": 6.484,
+        "end_s": 9.126,
+        "duration_s": 2.642,
+        "utterance": "003",
+        "words_spanned": "six",
+        "observed": 2.642,
+        "reference": 1.921,
+        "threshold": 0.35,
+        "delta": 0.72,
+        "unit": "s",
+        "metric": "silence before word"
+      },
+      {
+        "baseline_speaker": "p226",
+        "test_speaker": "p228",
+        "flaw_type": "long_pause",
+        "start_s": 16.471,
+        "end_s": 18.812,
+        "duration_s": 2.341,
+        "utterance": "004",
+        "words_spanned": "we",
+        "observed": 2.341,
+        "reference": 1.721,
+        "threshold": 0.35,
+        "delta": 0.62,
+        "unit": "s",
+        "metric": "silence before word"
+      }
+    ]
+  }
+}

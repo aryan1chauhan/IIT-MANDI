@@ -86,3 +86,26 @@ Full rebuilt 30-file evaluation ([`eval/results_matched.json`](eval/results_matc
 - Accuracy depends on alignment quality (MMS_FA word spans are about 20 ms resolution, CTC-tight).
 - At 10 dB SNR, the real-speech `speech1` control has a monotone false positive; treat low-SNR pitch findings as a limitation.
 - One baseline per text; delivery that is different but equally good (alternative phrasing/emphasis) may be flagged.
+
+## Natural-Speech Cross-Speaker Control Audit (VCTK 0.92)
+
+To evaluate whether SpeechLens triggers false alarms on natural human speaker variations when comparing two healthy, clean deliveries of the exact same text, a cross-speaker control audit was conducted using the **CSTR VCTK Corpus (v0.92)**.
+
+### Methodology & Scope
+- **Text**: The standard elicitation paragraph (utterances `001` to `005`: *"Please call Stella..."*, 69 words), identical across the 5 selected speakers (`p225`, `p226`, `p227`, `p228`, `p229`).
+- **Pausing Caveat**: VCTK's `wav48_silence_trimmed` source files have natural silence intervals stripped; inter-utterance pauses were concatenated with a uniform 0.3 s gap. Therefore, pausing flags on these clips indicate artificial concatenation timing artifacts rather than natural speaker hesitation.
+- **Protocol**: Natural-speech, cross-speaker control audit (no deliberate flaws; not an accuracy or F1 benchmark).
+- **Thresholds**: Evaluated under strictly frozen thresholds (`K_MAD = 3.0`, `FLOORS`).
+
+### Key Findings
+- **No rate, pitch, volume or clarity flags on 8 comparisons** (4 speakers evaluated against each of 2 distinct baselines: `p225` and `p226`).
+- **Pause flags at utterance boundaries on 3 of 4 clips; the aligned gap exceeds the acoustic silence by 1.2 to 1.9 s at every boundary, cause not yet determined**:
+  - RMS energy diagnostic (50 ms frames) at boundary 003→004 shows only ~0.25 s of digital silence (the 0.3 s concatenation gap) within aligned gaps of 1.6–2.3 s. The remaining time contains low-level audio (−39 to −53 dB), cause not yet determined. Listening to the exported debug clips settles whether this is room tone/breath in an inter-sentence pause (a real pause) or speech tails/onsets (misplaced word edges from the aligner).
+  - Two boundary flags sit near threshold (0.380 s and 0.379 s delta against the 0.35 s floor).
+- **Speaker `p229` was clean in both runs** (0 flags, 100.0 score under both baselines).
+- **Flag counts are stable between baselines** (4 flags under `p225`, 4 flags under `p226`). The `p227` span (2.16-4.74 s) and first `p228` span (6.48-9.13 s) recur under both baselines, showing they stem from those speakers' clips rather than the baseline choice.
+
+### Corpus Citation & Licence
+- **Corpus**: CSTR VCTK Corpus: English Multi-speaker Corpus for CSTR Voice Cloning Toolkit (version 0.92)
+- **Authors**: Yamagishi, Junichi; Veaux, Christophe; MacDonald, Kirsten. (2019). *CSTR VCTK Corpus: English Multi-speaker Corpus for CSTR Voice Cloning Toolkit (version 0.92)*, [sound]. University of Edinburgh. The Centre for Speech Technology Research (CSTR). https://doi.org/10.7488/ds/2645
+- **Licence**: Creative Commons Attribution 4.0 International (CC BY 4.0) (https://creativecommons.org/licenses/by/4.0/).
