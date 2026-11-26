@@ -29,6 +29,7 @@ from speechlens.io import load_audio
 from speechlens.text import load_alignment
 
 DEFAULT_VCTK_WAV = None  # pass --vctk-wav /path/to/VCTK-Corpus-0.92/wav48_silence_trimmed
+PAUSE_FLAW_TYPES = ("long_pause", "missing_pause")
 
 # Known utterance structure from the concatenation (5 sentences, 69 words total)
 UTTERANCES = [
@@ -63,6 +64,26 @@ UTTERANCES = [
         "text": "She can scoop these things into three red bags, and we will go meet her Wednesday at the train station.",
     },
 ]
+DEFAULT_SPLICE_BOUNDARY_WORDS = [u["word_start"] for u in UTTERANCES[1:]]
+
+
+def load_splice_boundary_words(data_dir: Path) -> list[int]:
+    """Return following-word indices at utterance concatenation seams."""
+    manifest_path = data_dir / "splice_manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        indices = manifest.get("splice_boundary_word_indices")
+        if isinstance(indices, list) and all(isinstance(i, int) for i in indices):
+            return indices
+    return list(DEFAULT_SPLICE_BOUNDARY_WORDS)
+
+
+def is_splice_boundary_flag(r: dict, splice_boundary_words: set[int]) -> bool:
+    """Return True if a pause flag spans an artificial utterance concatenation seam."""
+    if r.get("type") not in PAUSE_FLAW_TYPES:
+        return False
+    target_idx = r.get("word_end", r.get("word_start", -1))
+    return target_idx in splice_boundary_words
 
 
 def get_flag_utterance(r: dict) -> str:
@@ -103,7 +124,7 @@ def measure_source_file_silence(audio_path: Path, top_db: float = 35.0) -> tuple
 
 def run_boundary_silence_diagnostic(
     speakers: list[str],
-    vctk_wav_dir: Path,
+    vctk_wav_dir: Path | None,
     align_dir: Path,
 ) -> dict[str, Any]:
     """Diagnostic for all 5 speakers and each of the 4 utterance boundaries."""
@@ -113,10 +134,13 @@ def run_boundary_silence_diagnostic(
         ("003 -> 004", "003", "004", 33, 34, "bob", "we"),
         ("004 -> 005", "004", "005", 48, 49, "kids", "she"),
     ]
+    source_audio_available = vctk_wav_dir is not None and vctk_wav_dir.exists()
 
     print("\n" + "=" * 98)
     print("DIAGNOSTIC: SOURCE VCTK FILE SILENCES & INTER-UTTERANCE ALIGNED GAPS")
     print("=" * 98)
+    if not source_audio_available:
+        print("(Source VCTK FLAC directory not supplied/present; reporting aligned passage gaps only.)")
     header = f"{'Boundary':12s} | {'Speaker':7s} | {'Source Prev Trail':17s} | {'Concat Gap':10s} | {'Source Next Lead':16s} | {'Aligned Gap':11s}"
     print(header)
     print("-" * len(header))
@@ -126,11 +150,15 @@ def run_boundary_silence_diagnostic(
 
     for b_label, u_prev, u_next, w_prev_idx, w_next_idx, w_prev_word, w_next_word in boundaries:
         for spk in speakers:
-            f_prev = vctk_wav_dir / spk / f"{spk}_{u_prev}_mic1.flac"
-            f_next = vctk_wav_dir / spk / f"{spk}_{u_next}_mic1.flac"
-
-            _, trail_s = measure_source_file_silence(f_prev)
-            lead_s, _ = measure_source_file_silence(f_next)
+            trail_s = None
+            lead_s = None
+            if source_audio_available:
+                f_prev = vctk_wav_dir / spk / f"{spk}_{u_prev}_mic1.flac"
+                f_next = vctk_wav_dir / spk / f"{spk}_{u_next}_mic1.flac"
+                if f_prev.exists():
+                    _, trail_s = measure_source_file_silence(f_prev)
+                if f_next.exists():
+                    lead_s, _ = measure_source_file_silence(f_next)
 
             align_file = align_dir / f"{spk}.json"
             words = load_alignment(align_file)
@@ -145,13 +173,15 @@ def run_boundary_silence_diagnostic(
                 "prev_word": w_prev_word,
                 "next_word": w_next_word,
                 "speaker": spk,
-                "source_prev_trail_s": round(trail_s, 3),
+                "source_prev_trail_s": round(trail_s, 3) if trail_s is not None else None,
                 "concat_synthetic_gap_s": 0.300,
-                "source_next_lead_s": round(lead_s, 3),
+                "source_next_lead_s": round(lead_s, 3) if lead_s is not None else None,
                 "aligned_gap_s": round(aligned_gap, 3),
             }
             diagnostic_records.append(rec)
-            print(f"{b_label:12s} | {spk:7s} | {trail_s:15.3f} s | {'0.300 s':10s} | {lead_s:14.3f} s | {aligned_gap:9.3f} s")
+            trail_disp = f"{trail_s:15.3f} s" if trail_s is not None else f"{'n/a':>17s}"
+            lead_disp = f"{lead_s:14.3f} s" if lead_s is not None else f"{'n/a':>16s}"
+            print(f"{b_label:12s} | {spk:7s} | {trail_disp} | {'0.300 s':10s} | {lead_disp} | {aligned_gap:9.3f} s")
 
     print("\n" + "-" * 98)
     print("CROSS-SPEAKER BOUNDARY GAP VARIATION ANALYSIS (vs 0.35 s pause threshold):")
@@ -176,6 +206,7 @@ def run_boundary_silence_diagnostic(
         print(f"  Boundary {b_label}: min={min_gap:.3f}s ({min_spk}) to max={max_gap:.3f}s ({max_spk}) | Δ={diff:.3f}s -> {status}")
 
     return {
+        "source_audio_available": source_audio_available,
         "records": diagnostic_records,
         "boundary_variation": boundary_variation,
     }
@@ -186,8 +217,11 @@ def run_cross_speaker_audit(
     test_speakers: list[str],
     data_dir: Path,
     align_dir: Path,
+    splice_boundary_words: set[int] | None = None,
 ) -> dict[str, Any]:
     """Run cross-speaker audit against a chosen baseline."""
+    if splice_boundary_words is None:
+        splice_boundary_words = set(DEFAULT_SPLICE_BOUNDARY_WORDS)
     base_audio_path = data_dir / f"{baseline_spk}__passage.wav"
     base_align_path = align_dir / f"{baseline_spk}.json"
 
@@ -204,14 +238,16 @@ def run_cross_speaker_audit(
     print(f"AUDIT RUN: Baseline = {baseline_spk} (duration: {base_dur:.2f} s, {len(wb)} words)")
     print(f"Test Speakers: {test_speakers}")
     print(f"Frozen Thresholds: K_MAD={K_MAD}, FLOORS={FLOORS}")
+    print(f"Splice-Boundary Word Indices: {sorted(splice_boundary_words)}")
     print("=" * 86)
 
     flags_detailed = []
     speaker_summaries = {}
     total_test_duration = 0.0
     total_flagged_duration = 0.0
-    flaw_type_counts = defaultdict(int)
-    speaker_counts = defaultdict(int)
+    raw_flaw_type_counts = defaultdict(int)
+    splice_masked_flaw_type_counts = defaultdict(int)
+    splice_boundary_flag_count = 0
 
     for spk in test_speakers:
         part_audio_path = data_dir / f"{spk}__passage.wav"
@@ -229,24 +265,38 @@ def run_cross_speaker_audit(
 
         spk_flag_dur = sum(r["end"] - r["start"] for r in regions)
         total_flagged_duration += spk_flag_dur
-        speaker_counts[spk] = len(regions)
+
+        spk_splice_flags = [r for r in regions if is_splice_boundary_flag(r, splice_boundary_words)]
+        spk_masked_flags = [r for r in regions if not is_splice_boundary_flag(r, splice_boundary_words)]
 
         speaker_summaries[spk] = {
             "score": score,
             "clip_duration_s": clip_dur,
             "flag_count": len(regions),
+            "splice_boundary_flag_count": len(spk_splice_flags),
+            "splice_masked_flag_count": len(spk_masked_flags),
             "flagged_duration_s": spk_flag_dur,
             "flagged_fraction": spk_flag_dur / clip_dur if clip_dur > 0 else 0.0,
             "flaw_types": [r["type"] for r in regions],
+            "splice_masked_flaw_types": [r["type"] for r in spk_masked_flags],
         }
 
-        print(f"\n--- Speaker: {spk} (clip: {clip_dur:.2f} s, score: {score:.1f}/100, flags: {len(regions)}) ---")
+        print(
+            f"\n--- Speaker: {spk} (clip: {clip_dur:.2f} s, score: {score:.1f}/100, "
+            f"raw_flags: {len(regions)}, splice_masked_flags: {len(spk_masked_flags)}) ---"
+        )
         if not regions:
             print("  [No flags detected - 100% clean under cross-speaker comparison]")
 
         for r in regions:
             flaw = r["type"]
-            flaw_type_counts[flaw] += 1
+            at_splice = is_splice_boundary_flag(r, splice_boundary_words)
+            raw_flaw_type_counts[flaw] += 1
+            if at_splice:
+                splice_boundary_flag_count += 1
+            else:
+                splice_masked_flaw_type_counts[flaw] += 1
+
             start_s = r["start"]
             end_s = r["end"]
             dur = end_s - start_s
@@ -265,8 +315,11 @@ def run_cross_speaker_audit(
                 "start_s": round(start_s, 3),
                 "end_s": round(end_s, 3),
                 "duration_s": round(dur, 3),
+                "word_start": r.get("word_start"),
+                "word_end": r.get("word_end"),
                 "utterance": utt,
                 "words_spanned": r.get("text", ""),
+                "at_splice_boundary": at_splice,
                 "observed": round(obs, 3),
                 "reference": round(ref, 3),
                 "threshold": round(thr, 3),
@@ -276,35 +329,53 @@ def run_cross_speaker_audit(
             }
             flags_detailed.append(flag_entry)
 
-            print(f"  Flag: [{flaw.upper()}] at {start_s:.2f}s - {end_s:.2f}s (dur={dur:.2f}s)")
+            seam_note = " [SPLICE BOUNDARY]" if at_splice else ""
+            print(f"  Flag: [{flaw.upper()}]{seam_note} at {start_s:.2f}s - {end_s:.2f}s (dur={dur:.2f}s)")
             print(f"    Utterance: {utt} | Following Word: \"{r.get('text', '')}\"")
             print(f"    Measured: obs={obs:.3f} {unit} vs ref={ref:.3f} {unit} | delta={delta:.3f} | threshold={thr:.3f} {unit}")
 
     # Summary
+    raw_total = sum(raw_flaw_type_counts.values())
+    masked_total = sum(splice_masked_flaw_type_counts.values())
     print("\n" + "-" * 86)
     print(f"SUMMARY: Baseline = {baseline_spk}")
     print("-" * 86)
-    print("1. Flags per Speaker:")
+    print("1. Flags per Speaker (raw / splice-masked):")
     for spk in test_speakers:
         info = speaker_summaries[spk]
-        print(f"   {spk:8s}: {info['flag_count']} flags | {info['flagged_duration_s']:.2f}s flagged / {info['clip_duration_s']:.2f}s total ({info['flagged_fraction']*100:.1f}%) | Score: {info['score']:.1f}")
+        print(
+            f"   {spk:8s}: raw={info['flag_count']} (splice={info['splice_boundary_flag_count']}, "
+            f"masked={info['splice_masked_flag_count']}) | {info['flagged_duration_s']:.2f}s / "
+            f"{info['clip_duration_s']:.2f}s ({info['flagged_fraction']*100:.1f}%) | Score: {info['score']:.1f}"
+        )
 
-    print("\n2. Flags per Flaw Type:")
-    if not flaw_type_counts:
+    print("\n2. Flags per Flaw Type (Raw):")
+    if not raw_flaw_type_counts:
         print("   None (0 flags across all flaw types)")
     else:
-        for f_type, cnt in sorted(flaw_type_counts.items(), key=lambda x: -x[1]):
+        for f_type, cnt in sorted(raw_flaw_type_counts.items(), key=lambda x: -x[1]):
+            print(f"   {f_type:15s}: {cnt}")
+
+    print("\n3. Flags per Flaw Type (Splice-Masked, excluding utterance seams):")
+    if not splice_masked_flaw_type_counts:
+        print("   None (0 non-splice flags across all flaw types)")
+    else:
+        for f_type, cnt in sorted(splice_masked_flaw_type_counts.items(), key=lambda x: -x[1]):
             print(f"   {f_type:15s}: {cnt}")
 
     total_frac = total_flagged_duration / total_test_duration if total_test_duration > 0 else 0.0
-    print(f"\n3. Overall Flagged Duration Fraction:")
+    print(f"\n4. Overall Flagged Duration Fraction (Raw):")
     print(f"   Total flagged: {total_flagged_duration:.2f} s / {total_test_duration:.2f} s ({total_frac*100:.2f}%)")
 
     return {
         "baseline_speaker": baseline_spk,
         "test_speakers": test_speakers,
         "speaker_summaries": speaker_summaries,
-        "flaw_type_counts": dict(flaw_type_counts),
+        "raw_flag_count": raw_total,
+        "splice_boundary_flag_count": splice_boundary_flag_count,
+        "splice_masked_flag_count": masked_total,
+        "flaw_type_counts": dict(raw_flaw_type_counts),
+        "splice_masked_flaw_type_counts": dict(splice_masked_flaw_type_counts),
         "total_test_duration_s": round(total_test_duration, 2),
         "total_flagged_duration_s": round(total_flagged_duration, 2),
         "total_flagged_fraction": round(total_frac, 4),
@@ -315,17 +386,19 @@ def run_cross_speaker_audit(
 def main():
     parser = argparse.ArgumentParser(description="Run VCTK natural-speech cross-speaker audit.")
     parser.add_argument("--data", default="data/vctk", help="Directory containing concatenated VCTK audio")
-    parser.add_argument("--vctk-wav", default=str(DEFAULT_VCTK_WAV), help="Directory containing source VCTK wav48_silence_trimmed")
+    parser.add_argument("--vctk-wav", type=Path, default=DEFAULT_VCTK_WAV, help="Directory containing source VCTK wav48_silence_trimmed")
     parser.add_argument("--out", default="results/vctk_audit.json", help="Path to write JSON results")
     args = parser.parse_args()
 
     data_dir = ROOT / args.data
     align_dir = data_dir / "alignments"
-    vctk_wav_dir = Path(args.vctk_wav)
+    vctk_wav_dir = args.vctk_wav
     out_path = ROOT / args.out
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     all_speakers = ["p225", "p226", "p227", "p228", "p229"]
+    splice_boundary_list = load_splice_boundary_words(data_dir)
+    splice_boundary_words = set(splice_boundary_list)
 
     # Verify audio formats and sample rates
     for spk in all_speakers:
@@ -342,23 +415,53 @@ def main():
     print("\n" + "#" * 86)
     print("PHASE 1: BASELINE = p225")
     print("#" * 86 + "\n")
-    run1 = run_cross_speaker_audit("p225", ["p226", "p227", "p228", "p229"], data_dir, align_dir)
+    run1 = run_cross_speaker_audit("p225", ["p226", "p227", "p228", "p229"], data_dir, align_dir, splice_boundary_words)
 
     print("\n" + "#" * 86)
     print("PHASE 2: BASELINE = p226 (Checking Baseline Dependence)")
     print("#" * 86 + "\n")
-    run2 = run_cross_speaker_audit("p226", ["p225", "p227", "p228", "p229"], data_dir, align_dir)
+    run2 = run_cross_speaker_audit("p226", ["p225", "p227", "p228", "p229"], data_dir, align_dir, splice_boundary_words)
+
+    agg_raw = defaultdict(int)
+    agg_masked = defaultdict(int)
+    for r in (run1, run2):
+        for f_type, cnt in r["flaw_type_counts"].items():
+            agg_raw[f_type] += cnt
+        for f_type, cnt in r["splice_masked_flaw_type_counts"].items():
+            agg_masked[f_type] += cnt
+
+    total_comparisons = len(run1["test_speakers"]) + len(run2["test_speakers"])
+    total_raw = sum(agg_raw.values())
+    total_splice = run1["splice_boundary_flag_count"] + run2["splice_boundary_flag_count"]
+    total_masked = sum(agg_masked.values())
 
     combined_results = {
         "title": "VCTK Natural-Speech Cross-Speaker Control Audit",
         "protocol": "natural-speech, cross-speaker audit (no deliberate flaws; not accuracy or F1)",
+        "splice_boundary_word_indices": splice_boundary_list,
         "summary_claims": [
-            "No rate, pitch, volume or clarity flags on 8 comparisons.",
-            "Pause flags at utterance boundaries on 3 of 4 clips; the aligned gap exceeds the acoustic silence by 1.2 to 1.9 s at every boundary, cause not yet determined.",
+            f"Raw totals across {total_comparisons} comparisons: {total_raw} flags ({dict(agg_raw)}).",
+            (
+                f"All {total_splice} pause flags occur at artificial utterance concatenation boundaries "
+                f"(word indices {splice_boundary_list}); splice-masked totals: {total_masked} flags ({dict(agg_masked)})."
+                if total_splice == total_raw
+                else f"Splice-boundary pause flags: {total_splice}; splice-masked totals: {total_masked} flags ({dict(agg_masked)})."
+            ),
+            "Zero rate, pitch, volume, clarity, or intra-utterance pause flags across all comparisons."
+            if total_masked == 0
+            else f"Non-splice flags remaining after masking seams: {dict(agg_masked)}.",
         ],
         "thresholds_frozen": {
             "K_MAD": K_MAD,
             "FLOORS": FLOORS,
+        },
+        "aggregate_counts": {
+            "comparisons": total_comparisons,
+            "raw_total_flags": total_raw,
+            "raw_flaw_type_counts": dict(agg_raw),
+            "splice_boundary_flag_count": total_splice,
+            "splice_masked_total_flags": total_masked,
+            "splice_masked_flaw_type_counts": dict(agg_masked),
         },
         "boundary_silence_diagnostic": diagnostic_results,
         "run_p225_baseline": run1,

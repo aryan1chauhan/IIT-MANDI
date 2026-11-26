@@ -6,6 +6,7 @@
 (4) Prints each clip's duration and the shared text.
 """
 import argparse
+import json
 import sys
 from pathlib import Path
 import librosa
@@ -16,29 +17,30 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_VCTK = None  # pass --vctk /path/to/VCTK-Corpus-0.92
 TARGET_SR = 16000
 GAP_SEC = 0.30
+TRIM_TOP_DB = 35.0
 
 
 def find_shared_utterances(txt_dir: Path, speakers: list[str]) -> list[tuple[str, str]]:
     """Find utterances present across all given speakers with identical text."""
-    speaker_utts = {}
+    utterances_by_speaker = {}
     for spk in speakers:
         spk_dir = txt_dir / spk
         if not spk_dir.is_dir():
             raise FileNotFoundError(f"Speaker directory not found: {spk_dir}")
-        spk_utts = {}
+        per_speaker = {}
         for p in spk_dir.glob("*.txt"):
             utt_id = p.stem.split("_")[-1]
             text = p.read_text(encoding="utf-8", errors="ignore").strip()
-            spk_utts[utt_id] = text
-        speaker_utts[spk] = spk_utts
+            per_speaker[utt_id] = text
+        utterances_by_speaker[spk] = per_speaker
 
     # Intersect keys across all selected speakers
-    common_keys = sorted(set.intersection(*[set(u.keys()) for u in speaker_utts.values()]))
+    common_keys = sorted(set.intersection(*[set(u.keys()) for u in utterances_by_speaker.values()]))
 
     # Filter for identical text
     identical = []
     for k in common_keys:
-        texts = [speaker_utts[spk][k] for spk in speakers]
+        texts = [utterances_by_speaker[spk][k] for spk in speakers]
         if len(set(texts)) == 1:
             identical.append((k, texts[0]))
 
@@ -58,12 +60,27 @@ def get_audio_file(wav_dir: Path, speaker: str, utt_id: str) -> Path:
     return candidates[0]
 
 
+def trim_clip_silence(y: np.ndarray, sr: int = TARGET_SR, top_db: float = TRIM_TOP_DB) -> np.ndarray:
+    """Trim leading and trailing low-energy silence so concatenation gaps stay uniform."""
+    if y.ndim > 1:
+        y = np.mean(y, axis=1)
+    y_trimmed, _ = librosa.effects.trim(
+        y,
+        top_db=top_db,
+        frame_length=int(0.025 * sr),
+        hop_length=int(0.010 * sr),
+    )
+    return y_trimmed
+
+
 def main():
     parser = argparse.ArgumentParser(description="Prepare VCTK cross-speaker dataset.")
     parser.add_argument("--vctk", type=Path, default=DEFAULT_VCTK, help="Path to unzipped VCTK-Corpus-0.92")
     parser.add_argument("--num-speakers", type=int, default=5, help="Number of speakers to prepare")
     args = parser.parse_args()
 
+    if args.vctk is None:
+        parser.error("--vctk /path/to/VCTK-Corpus-0.92 is required")
     vctk_dir = args.vctk
     txt_dir = vctk_dir / "txt"
     wav_dir = vctk_dir / "wav48_silence_trimmed"
@@ -99,10 +116,32 @@ def main():
     transcript_file.write_text(full_text + "\n", encoding="utf-8")
     (transcripts_dir / "vctk_passage.txt").write_text(full_text + "\n", encoding="utf-8")
 
+    # Write splice boundary manifest (word indices where utterances join)
+    utterance_manifest = []
+    word_cursor = 0
+    for k, text in shared_stella:
+        n_words = len(text.split())
+        utterance_manifest.append(
+            {
+                "id": k,
+                "word_start": word_cursor,
+                "word_end": word_cursor + n_words - 1,
+                "text": text,
+            }
+        )
+        word_cursor += n_words
+    splice_manifest = {
+        "gap_sec": GAP_SEC,
+        "trim_top_db": TRIM_TOP_DB,
+        "splice_boundary_word_indices": [u["word_start"] for u in utterance_manifest[1:]],
+        "utterances": utterance_manifest,
+    }
+    (out_dir / "splice_manifest.json").write_text(json.dumps(splice_manifest, indent=2), encoding="utf-8")
+
     gap = np.zeros(int(GAP_SEC * TARGET_SR), dtype=np.float32)
 
     # (2) Concatenate for each speaker
-    print("\nConcatenating audio clips with 0.3s gap (resampled to 16 kHz):")
+    print(f"\nConcatenating silence-trimmed clips (top_db={TRIM_TOP_DB}) with {GAP_SEC:.2f}s gap (16 kHz):")
     durations = {}
     for spk in selected_speakers:
         pieces = []
@@ -111,6 +150,7 @@ def main():
             y, sr = sf.read(str(audio_path), dtype="float32")
             if sr != TARGET_SR:
                 y = librosa.resample(y, orig_sr=sr, target_sr=TARGET_SR)
+            y = trim_clip_silence(y, TARGET_SR)
             pieces.append(y)
             if i < len(shared_stella) - 1:
                 pieces.append(gap)

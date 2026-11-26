@@ -57,6 +57,7 @@ docs/assets/
 # Generated report artifacts (regenerable from pipeline)
 report.json
 report_monotone.json
+eval/demo_report.html
 
 # Real eval intermediate data (dev-only, regenerable)
 data/real/alignments/

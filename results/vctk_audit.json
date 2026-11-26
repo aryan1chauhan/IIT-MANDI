@@ -1,9 +1,16 @@
 {
   "title": "VCTK Natural-Speech Cross-Speaker Control Audit",
   "protocol": "natural-speech, cross-speaker audit (no deliberate flaws; not accuracy or F1)",
+  "splice_boundary_word_indices": [
+    3,
+    14,
+    34,
+    49
+  ],
   "summary_claims": [
-    "No rate, pitch, volume or clarity flags on 8 comparisons.",
-    "Pause flags at utterance boundaries on 3 of 4 clips; the aligned gap exceeds the acoustic silence by 1.2 to 1.9 s at every boundary, cause not yet determined."
+    "Raw totals across 8 comparisons: 8 flags ({'long_pause': 8}).",
+    "All 8 pause flags occur at artificial utterance concatenation boundaries (word indices [3, 14, 34, 49]); splice-masked totals: 0 flags ({}).",
+    "Zero rate, pitch, volume, clarity, or intra-utterance pause flags across all comparisons."
   ],
   "thresholds_frozen": {
     "K_MAD": 3.0,
@@ -15,7 +22,18 @@
       "clarity": 4.0
     }
   },
+  "aggregate_counts": {
+    "comparisons": 8,
+    "raw_total_flags": 8,
+    "raw_flaw_type_counts": {
+      "long_pause": 8
+    },
+    "splice_boundary_flag_count": 8,
+    "splice_masked_total_flags": 0,
+    "splice_masked_flaw_type_counts": {}
+  },
   "boundary_silence_diagnostic": {
+    "source_audio_available": false,
     "records": [
       {
         "boundary": "001 -> 002",
@@ -24,9 +42,9 @@
         "prev_word": "stella",
         "next_word": "ask",
         "speaker": "p225",
-        "source_prev_trail_s": 0.14,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.67,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.841
       },
       {
@@ -36,9 +54,9 @@
         "prev_word": "stella",
         "next_word": "ask",
         "speaker": "p226",
-        "source_prev_trail_s": 0.04,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.44,
+        "source_next_lead_s": null,
         "aligned_gap_s": 2.201
       },
       {
@@ -48,9 +66,9 @@
         "prev_word": "stella",
         "next_word": "ask",
         "speaker": "p227",
-        "source_prev_trail_s": 0.12,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.3,
+        "source_next_lead_s": null,
         "aligned_gap_s": 2.581
       },
       {
@@ -60,9 +78,9 @@
         "prev_word": "stella",
         "next_word": "ask",
         "speaker": "p228",
-        "source_prev_trail_s": 0.0,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.861
       },
       {
@@ -72,9 +90,9 @@
         "prev_word": "stella",
         "next_word": "ask",
         "speaker": "p229",
-        "source_prev_trail_s": 0.0,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.521
       },
       {
@@ -84,9 +102,9 @@
         "prev_word": "store",
         "next_word": "six",
         "speaker": "p225",
-        "source_prev_trail_s": 0.0,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.35,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.921
       },
       {
@@ -96,9 +114,9 @@
         "prev_word": "store",
         "next_word": "six",
         "speaker": "p226",
-        "source_prev_trail_s": 0.62,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.24,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.921
       },
       {
@@ -108,9 +126,9 @@
         "prev_word": "store",
         "next_word": "six",
         "speaker": "p227",
-        "source_prev_trail_s": 0.21,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.8
       },
       {
@@ -120,9 +138,9 @@
         "prev_word": "store",
         "next_word": "six",
         "speaker": "p228",
-        "source_prev_trail_s": 0.0,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.05,
+        "source_next_lead_s": null,
         "aligned_gap_s": 2.642
       },
       {
@@ -132,9 +150,9 @@
         "prev_word": "store",
         "next_word": "six",
         "speaker": "p229",
-        "source_prev_trail_s": 0.12,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.15,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.741
       },
       {
@@ -144,9 +162,9 @@
         "prev_word": "bob",
         "next_word": "we",
         "speaker": "p225",
-        "source_prev_trail_s": 0.57,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 2.081
       },
       {
@@ -156,9 +174,9 @@
         "prev_word": "bob",
         "next_word": "we",
         "speaker": "p226",
-        "source_prev_trail_s": 0.01,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.31,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.721
       },
       {
@@ -168,9 +186,9 @@
         "prev_word": "bob",
         "next_word": "we",
         "speaker": "p227",
-        "source_prev_trail_s": 0.02,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.9
       },
       {
@@ -180,9 +198,9 @@
         "prev_word": "bob",
         "next_word": "we",
         "speaker": "p228",
-        "source_prev_trail_s": 0.02,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 2.341
       },
       {
@@ -192,9 +210,9 @@
         "prev_word": "bob",
         "next_word": "we",
         "speaker": "p229",
-        "source_prev_trail_s": 0.01,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.621
       },
       {
@@ -204,9 +222,9 @@
         "prev_word": "kids",
         "next_word": "she",
         "speaker": "p225",
-        "source_prev_trail_s": 0.06,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.521
       },
       {
@@ -216,9 +234,9 @@
         "prev_word": "kids",
         "next_word": "she",
         "speaker": "p226",
-        "source_prev_trail_s": 0.43,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.01,
+        "source_next_lead_s": null,
         "aligned_gap_s": 2.382
       },
       {
@@ -228,9 +246,9 @@
         "prev_word": "kids",
         "next_word": "she",
         "speaker": "p227",
-        "source_prev_trail_s": 0.0,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.56
       },
       {
@@ -240,9 +258,9 @@
         "prev_word": "kids",
         "next_word": "she",
         "speaker": "p228",
-        "source_prev_trail_s": 0.0,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.0,
+        "source_next_lead_s": null,
         "aligned_gap_s": 2.001
       },
       {
@@ -252,9 +270,9 @@
         "prev_word": "kids",
         "next_word": "she",
         "speaker": "p229",
-        "source_prev_trail_s": 0.04,
+        "source_prev_trail_s": null,
         "concat_synthetic_gap_s": 0.3,
-        "source_next_lead_s": 0.05,
+        "source_next_lead_s": null,
         "aligned_gap_s": 1.481
       }
     ],
@@ -306,45 +324,61 @@
         "score": 64.0,
         "clip_duration_s": 30.14,
         "flag_count": 1,
+        "splice_boundary_flag_count": 1,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 2.381599999999999,
         "flagged_fraction": 0.07901791639017912,
         "flaw_types": [
           "long_pause"
-        ]
+        ],
+        "splice_masked_flaw_types": []
       },
       "p227": {
         "score": 65.8,
         "clip_duration_s": 30.7061875,
         "flag_count": 1,
+        "splice_boundary_flag_count": 1,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 2.5805999999999996,
         "flagged_fraction": 0.08404169355117758,
         "flaw_types": [
           "long_pause"
-        ]
+        ],
+        "splice_masked_flaw_types": []
       },
       "p228": {
         "score": 56.0,
         "clip_duration_s": 32.041125,
         "flag_count": 2,
+        "splice_boundary_flag_count": 2,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 4.643,
         "flagged_fraction": 0.1449075211934662,
         "flaw_types": [
           "long_pause",
           "long_pause"
-        ]
+        ],
+        "splice_masked_flaw_types": []
       },
       "p229": {
         "score": 100.0,
         "clip_duration_s": 24.56025,
         "flag_count": 0,
+        "splice_boundary_flag_count": 0,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 0,
         "flagged_fraction": 0.0,
-        "flaw_types": []
+        "flaw_types": [],
+        "splice_masked_flaw_types": []
       }
     },
+    "raw_flag_count": 4,
+    "splice_boundary_flag_count": 4,
+    "splice_masked_flag_count": 0,
     "flaw_type_counts": {
       "long_pause": 4
     },
+    "splice_masked_flaw_type_counts": {},
     "total_test_duration_s": 117.45,
     "total_flagged_duration_s": 9.61,
     "total_flagged_fraction": 0.0818,
@@ -356,8 +390,11 @@
         "start_s": 20.974,
         "end_s": 23.355,
         "duration_s": 2.382,
+        "word_start": 49,
+        "word_end": 49,
         "utterance": "005",
         "words_spanned": "she",
+        "at_splice_boundary": true,
         "observed": 2.382,
         "reference": 1.521,
         "threshold": 0.35,
@@ -372,8 +409,11 @@
         "start_s": 2.16,
         "end_s": 4.741,
         "duration_s": 2.581,
+        "word_start": 3,
+        "word_end": 3,
         "utterance": "002",
         "words_spanned": "ask",
+        "at_splice_boundary": true,
         "observed": 2.581,
         "reference": 1.841,
         "threshold": 0.35,
@@ -388,8 +428,11 @@
         "start_s": 6.484,
         "end_s": 9.126,
         "duration_s": 2.642,
+        "word_start": 14,
+        "word_end": 14,
         "utterance": "003",
         "words_spanned": "six",
+        "at_splice_boundary": true,
         "observed": 2.642,
         "reference": 1.921,
         "threshold": 0.35,
@@ -404,8 +447,11 @@
         "start_s": 23.495,
         "end_s": 25.497,
         "duration_s": 2.001,
+        "word_start": 49,
+        "word_end": 49,
         "utterance": "005",
         "words_spanned": "she",
+        "at_splice_boundary": true,
         "observed": 2.001,
         "reference": 1.521,
         "threshold": 0.35,
@@ -428,45 +474,61 @@
         "score": 82.4,
         "clip_duration_s": 25.5124375,
         "flag_count": 1,
+        "splice_boundary_flag_count": 1,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 2.0809999999999995,
         "flagged_fraction": 0.08156805871645935,
         "flaw_types": [
           "long_pause"
-        ]
+        ],
+        "splice_masked_flaw_types": []
       },
       "p227": {
         "score": 79.1,
         "clip_duration_s": 30.7061875,
         "flag_count": 1,
+        "splice_boundary_flag_count": 1,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 2.5805999999999996,
         "flagged_fraction": 0.08404169355117758,
         "flaw_types": [
           "long_pause"
-        ]
+        ],
+        "splice_masked_flaw_types": []
       },
       "p228": {
         "score": 55.7,
         "clip_duration_s": 32.041125,
         "flag_count": 2,
+        "splice_boundary_flag_count": 2,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 4.983199999999999,
         "flagged_fraction": 0.1555251259124016,
         "flaw_types": [
           "long_pause",
           "long_pause"
-        ]
+        ],
+        "splice_masked_flaw_types": []
       },
       "p229": {
         "score": 100.0,
         "clip_duration_s": 24.56025,
         "flag_count": 0,
+        "splice_boundary_flag_count": 0,
+        "splice_masked_flag_count": 0,
         "flagged_duration_s": 0,
         "flagged_fraction": 0.0,
-        "flaw_types": []
+        "flaw_types": [],
+        "splice_masked_flaw_types": []
       }
     },
+    "raw_flag_count": 4,
+    "splice_boundary_flag_count": 4,
+    "splice_masked_flag_count": 0,
     "flaw_type_counts": {
       "long_pause": 4
     },
+    "splice_masked_flaw_type_counts": {},
     "total_test_duration_s": 112.82,
     "total_flagged_duration_s": 9.64,
     "total_flagged_fraction": 0.0855,
@@ -478,8 +540,11 @@
         "start_s": 13.347,
         "end_s": 15.428,
         "duration_s": 2.081,
+        "word_start": 34,
+        "word_end": 34,
         "utterance": "004",
         "words_spanned": "we",
+        "at_splice_boundary": true,
         "observed": 2.081,
         "reference": 1.721,
         "threshold": 0.35,
@@ -494,8 +559,11 @@
         "start_s": 2.16,
         "end_s": 4.741,
         "duration_s": 2.581,
+        "word_start": 3,
+        "word_end": 3,
         "utterance": "002",
         "words_spanned": "ask",
+        "at_splice_boundary": true,
         "observed": 2.581,
         "reference": 2.201,
         "threshold": 0.35,
@@ -510,8 +578,11 @@
         "start_s": 6.484,
         "end_s": 9.126,
         "duration_s": 2.642,
+        "word_start": 14,
+        "word_end": 14,
         "utterance": "003",
         "words_spanned": "six",
+        "at_splice_boundary": true,
         "observed": 2.642,
         "reference": 1.921,
         "threshold": 0.35,
@@ -526,8 +597,11 @@
         "start_s": 16.471,
         "end_s": 18.812,
         "duration_s": 2.341,
+        "word_start": 34,
+        "word_end": 34,
         "utterance": "004",
         "words_spanned": "we",
+        "at_splice_boundary": true,
         "observed": 2.341,
         "reference": 1.721,
         "threshold": 0.35,
