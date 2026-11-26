@@ -63,3 +63,13 @@ eval/demo_report.html
 data/real/alignments/
 data/real/labels/
 eval/real_results.json
+
+# Secrets, environment files, and credentials (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
