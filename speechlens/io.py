@@ -15,7 +15,7 @@ def load_audio(path, sr: int = SR) -> np.ndarray:
                 UserWarning,
                 stacklevel=2,
             )
-    except Exception:
+    except (OSError, RuntimeError):
         pass
     y, _ = librosa.load(str(path), sr=sr, mono=True)
     return y.astype(np.float32)

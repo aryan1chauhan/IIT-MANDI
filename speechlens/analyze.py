@@ -23,6 +23,8 @@ from .features import extract, word_table
 
 K_MAD = 3.0
 FLOORS = {"rate": 0.30, "pause": 0.35, "pitch": 0.30, "energy": 5.0, "clarity": 4.0}
+EDGE_RATIO = 0.65
+PITCH_EDGE_RATIO = 0.75
 
 DIMENSIONS = {  # rubric: dimension -> (flaw types, weight)
     "pace":           (("rushed", "dragging"), 0.20),
@@ -62,6 +64,29 @@ def _runs(flag, close=1, min_len=2):
     return out
 
 
+def _expand_runs(runs, dcc, thr, direction, edge_ratio):
+    """Expand confirmed runs outward across contiguous same-sign words >= edge_ratio * thr, merging overlaps."""
+    if not runs:
+        return []
+    n = len(dcc)
+    low = edge_ratio * thr
+    expanded = []
+    for i, j in runs:
+        while i > 0 and np.isfinite(dcc[i - 1]) and direction * dcc[i - 1] >= low:
+            i -= 1
+        while j + 1 < n and np.isfinite(dcc[j + 1]) and direction * dcc[j + 1] >= low:
+            j += 1
+        expanded.append((i, j))
+    expanded.sort()
+    merged = [expanded[0]]
+    for i, j in expanded[1:]:
+        if i <= merged[-1][1] + 1:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], j))
+        else:
+            merged.append((i, j))
+    return merged
+
+
 def _threshold(d, floor):
     d = d[np.isfinite(d)]
     if len(d) < 5:
@@ -94,23 +119,60 @@ def detect_regions(wt_p, wt_b, words_p, words_b=None):
             observed=float(obs), reference=float(ref), delta=float(np.nanmean(d[i:j + 1])),
             threshold=float(thr), magnitude=mag, severity=float(np.clip((mag - 1) / 3, 0, 1))))
 
-    # --- pace
-    d = np.log(np.maximum(wt_p["dur"], 1e-3) / np.maximum(wt_b["dur"], 1e-3))
+    # --- pace (per-word + 3-word rolling articulation window)
+    dur_p = wt_p["dur"]
+    dur_b = wt_b["dur"]
+    d = np.log(np.maximum(dur_p, 1e-3) / np.maximum(dur_b, 1e-3))
     dc = d - np.median(d)
     thr = _threshold(d, FLOORS["rate"])
-    for kind, flag in (("rushed", dc < -thr), ("dragging", dc > thr)):
-        for i, j in _runs(flag):
-            add(kind, i, j, dc, thr, np.median(wt_p["dur"][i:j + 1]), np.median(wt_b["dur"][i:j + 1]),
+
+    dw = np.full(n, np.nan)
+    for k in range(1, n - 1):
+        if np.all(dur_b[k - 1:k + 2] > 0) and np.all(dur_p[k - 1:k + 2] > 0):
+            dw[k] = np.log(np.sum(dur_p[k - 1:k + 2]) / np.sum(dur_b[k - 1:k + 2]))
+    med_w = float(np.nanmedian(dw)) if np.isfinite(dw).any() else 0.0
+    dcc_win = np.nan_to_num(dw - med_w)
+    thr_win = _threshold(dw, FLOORS["rate"])
+
+    norm_word = dc / thr
+    norm_win = dcc_win / thr_win
+    norm_rate = np.where(np.abs(norm_win) > np.abs(norm_word), norm_win, norm_word)
+
+    dragging_spans = []
+    for kind, flag_word, flag_win, direction in (
+        ("rushed", dc < -thr, dcc_win < -thr_win, -1),
+        ("dragging", dc > thr, dcc_win > thr_win, 1),
+    ):
+        seeds = _runs(flag_word) + _runs(flag_win)
+        if not seeds:
+            continue
+        seeds.sort()
+        merged_seeds = [seeds[0]]
+        for s, e in seeds[1:]:
+            if s <= merged_seeds[-1][1] + 1:
+                merged_seeds[-1] = (merged_seeds[-1][0], max(merged_seeds[-1][1], e))
+            else:
+                merged_seeds.append((s, e))
+        for i, j in _expand_runs(merged_seeds, norm_rate, 1.0, direction, EDGE_RATIO):
+            add(kind, i, j, dc, thr, np.median(dur_p[i:j + 1]), np.median(dur_b[i:j + 1]),
                 "s/word", "median word duration")
+            if kind == "dragging":
+                local_scale = max(1.0, float(np.nanmedian(dur_p[i:j + 1] / np.maximum(dur_b[i:j + 1], 1e-6))))
+                dragging_spans.append((i, j, local_scale))
     # --- pauses
     d = wt_p["gap"] - wt_b["gap"]
+    med_pause = np.median(d)
     thr = _threshold(d, FLOORS["pause"])
-    for i in np.where(d - np.median(d) > thr)[0]:
-        add("long_pause", int(i), int(i), d - np.median(d), thr, wt_p["gap"][i], wt_b["gap"][i], "s",
-            "silence before word", start=words_p[i - 1]["end"] if i > 0 else words_p[i]["start"],
-            end=words_p[i]["start"],
-            base_start=words_b[i - 1]["end"] if (words_b is not None and i > 0) else (words_b[i]["start"] if words_b is not None else None),
-            base_end=words_b[i]["start"] if words_b is not None else None)
+    for i in np.where(d - med_pause > thr)[0]:
+        idx = int(i)
+        scales = [loc_s for s, e, loc_s in dragging_spans if s <= idx <= e]
+        if scales and (wt_p["gap"][idx] - wt_b["gap"][idx] * max(scales) <= thr):
+            continue
+        add("long_pause", idx, idx, d - med_pause, thr, wt_p["gap"][idx], wt_b["gap"][idx], "s",
+            "silence before word", start=words_p[idx - 1]["end"] if idx > 0 else words_p[idx]["start"],
+            end=words_p[idx]["start"],
+            base_start=words_b[idx - 1]["end"] if (words_b is not None and idx > 0) else (words_b[idx]["start"] if words_b is not None else None),
+            base_end=words_b[idx]["start"] if words_b is not None else None)
     for i in np.where((wt_b["gap"] >= 0.35) & (wt_p["gap"] < 0.1))[0]:
         add("missing_pause", int(i), int(i), wt_p["gap"] - wt_b["gap"], 0.25, wt_p["gap"][i], wt_b["gap"][i],
             "s", "silence before word", start=words_p[i - 1]["end"] if i > 0 else words_p[i]["start"],
@@ -122,23 +184,23 @@ def detect_regions(wt_p, wt_b, words_p, words_b=None):
     dcc = d - np.nanmedian(d)
     thr = _threshold(d, FLOORS["pitch"])
     dcc = np.nan_to_num(dcc)
-    for kind, flag in (("monotone", dcc < -thr), ("erratic_pitch", dcc > thr)):
-        for i, j in _runs(flag, min_len=3):
+    for kind, flag, direction in (("monotone", dcc < -thr, -1), ("erratic_pitch", dcc > thr, 1)):
+        for i, j in _expand_runs(_runs(flag, min_len=3), dcc, thr, direction, PITCH_EDGE_RATIO):
             add(kind, i, j, dcc, thr, np.nanmean(wt_p["pitch_range"][i:j + 1]),
                 np.nanmean(wt_b["pitch_range"][i:j + 1]), "semitones", "pitch range (p90-p10)")
     # --- volume
     d = wt_p["energy"] - wt_b["energy"]
     dc = d - np.median(d)
     thr = _threshold(d, FLOORS["energy"])
-    for kind, flag in (("volume_drop", dc < -thr), ("volume_spike", dc > thr)):
-        for i, j in _runs(flag, min_len=3):
+    for kind, flag, direction in (("volume_drop", dc < -thr, -1), ("volume_spike", dc > thr, 1)):
+        for i, j in _expand_runs(_runs(flag, min_len=3), dc, thr, direction, EDGE_RATIO):
             add(kind, i, j, dc, thr, np.mean(wt_p["energy"][i:j + 1]), np.mean(wt_b["energy"][i:j + 1]),
                 "dB", "mean level re speaker median")
     # --- clarity
     d = wt_p["hf"] - wt_b["hf"]
     dc = d - np.median(d)
     thr = _threshold(d, FLOORS["clarity"])
-    for i, j in _runs(dc < -thr):
+    for i, j in _expand_runs(_runs(dc < -thr), dc, thr, -1, EDGE_RATIO):
         add("muffled", i, j, dc, thr, np.mean(wt_p["hf"][i:j + 1]), np.mean(wt_b["hf"][i:j + 1]), "dB",
             "high-band (>3 kHz) power share")
     regions.sort(key=lambda r: r["start"])

@@ -84,8 +84,8 @@ def extract(y: np.ndarray, sr: int = SR) -> Features:
     # de Looze & Hirst (2014) two-pass pitch estimation.
     floor, ceiling = _adaptive_pitch_bounds(snd)
 
-    # Pass 2: Re-estimate with speaker-adapted boundaries
-    pitch = snd.to_pitch_ac(time_step=HOP / sr, pitch_floor=floor, pitch_ceiling=ceiling,
+    # Pass 2: Re-estimate with speaker-adapted boundaries using cross-correlation
+    pitch = snd.to_pitch_cc(time_step=HOP / sr, pitch_floor=floor, pitch_ceiling=ceiling,
                             silence_threshold=0.005)  # low: keep quiet passages voiced
     f0 = pitch.selected_array["frequency"]
     px = pitch.xs()
