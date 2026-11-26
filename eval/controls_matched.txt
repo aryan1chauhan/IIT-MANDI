@@ -13,30 +13,26 @@ mp3_64k        analytic       2         0              0        100.0
 mp3_64k        realigned      2         0              0        100.0
 noise_20dB     analytic       2         0              0        100.0
 noise_20dB     realigned      2         0              0        100.0
-noise_10dB     analytic       2         1              1         84.3
-noise_10dB     realigned      2         1              1         84.3
+noise_10dB     analytic       2         0              0        100.0
+noise_10dB     realigned      2         0              0        100.0
 gain_-6        analytic       2         0              0        100.0
 gain_-6        realigned      2         0              0        100.0
 
 FPs by type, analytic:
-  monotone: 1
 
 FPs by type, realigned:
-  monotone: 1
 
 Flagged words with duration <= 40 ms on either side (analytic):
-  All types: 1/3 words (33.3%) <= 40 ms on either side
+  All types: 0/0 words (0.0%) <= 40 ms on either side
   Rate only: 0/0 words (0.0%) <= 40 ms on either side
 
 Flagged words with duration <= 40 ms on either side (realigned):
-  All types: 1/3 words (33.3%) <= 40 ms on either side
+  All types: 0/0 words (0.0%) <= 40 ms on either side
   Rate only: 0/0 words (0.0%) <= 40 ms on either side
 
 Realigned FPs by baseline duration (ms), all types, and rate only:
   0-60: 0 (rate: 0)
   60-120: 0 (rate: 0)
-  120-inf: 1 (rate: 0)
+  120-inf: 0 (rate: 0)
 
 FP regions (file, control, path, type, start-end, base_ms, magnitude, words, <=40ms):
-  speech1  noise_10dB  analytic  monotone  3.862-6.023  2161  3.81  words=3  short=1
-  speech1  noise_10dB  realigned  monotone  3.862-6.023  2161  3.82  words=3  short=1

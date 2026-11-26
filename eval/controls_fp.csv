@@ -1,3 +1,1 @@
 id,control,path,type,start,end,base_dur_ms,magnitude,n_words,n_words_le_40ms
-speech1,noise_10dB,analytic,monotone,3.862,6.023,2161,3.81,3,1
-speech1,noise_10dB,realigned,monotone,3.862,6.023,2161,3.82,3,1

@@ -31,7 +31,7 @@ speech1,mp3_64k,analytic,0.0691,0,100.0
 speech1,mp3_64k,realigned,0.0691,0,100.0
 speech1,noise_20dB,analytic,0.0,0,100.0
 speech1,noise_20dB,realigned,0.0,0,100.0
-speech1,noise_10dB,analytic,0.0,1,68.7
-speech1,noise_10dB,realigned,0.0,1,68.7
+speech1,noise_10dB,analytic,0.0,0,100.0
+speech1,noise_10dB,realigned,0.0,0,100.0
 speech1,gain_-6,analytic,0.0,0,100.0
 speech1,gain_-6,realigned,0.0,0,100.0

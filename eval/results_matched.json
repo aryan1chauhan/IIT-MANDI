@@ -10,11 +10,11 @@
   },
   "long_pause": {
    "recall": 1.0,
-   "precision": 0.7142857142857143,
-   "f1": 0.8333333333333333,
+   "precision": 1.0,
+   "f1": 1.0,
    "tp": 5,
    "fn": 0,
-   "fp": 2
+   "fp": 0
   },
   "monotone": {
    "recall": 0.6666666666666666,
@@ -33,11 +33,11 @@
    "fp": 0
   },
   "rushed": {
-   "recall": 0.6666666666666666,
+   "recall": 0.8333333333333334,
    "precision": 1.0,
-   "f1": 0.8,
-   "tp": 4,
-   "fn": 2,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 1,
    "fp": 0
   },
   "volume_drop": {
@@ -50,50 +50,50 @@
   }
  },
  "per_severity_iou_0.5": {
-  "1": 0.16666666666666666,
-  "2": 0.6,
-  "3": 0.8888888888888888,
+  "1": 0.3333333333333333,
+  "2": 0.8,
+  "3": 1.0,
   "4": 1.0
  },
  "iou_0.5": {
   "dragging": {
-   "recall": 0.5,
-   "precision": 0.75,
-   "f1": 0.6,
-   "tp": 3,
-   "fn": 3,
-   "fp": 1
-  },
-  "long_pause": {
-   "recall": 1.0,
-   "precision": 0.7142857142857143,
-   "f1": 0.8333333333333333,
-   "tp": 5,
-   "fn": 0,
-   "fp": 2
-  },
-  "monotone": {
-   "recall": 0.5,
-   "precision": 0.75,
-   "f1": 0.6,
-   "tp": 3,
-   "fn": 3,
-   "fp": 1
-  },
-  "muffled": {
-   "recall": 0.875,
-   "precision": 0.875,
-   "f1": 0.875,
-   "tp": 7,
-   "fn": 1,
-   "fp": 1
-  },
-  "rushed": {
    "recall": 0.6666666666666666,
    "precision": 1.0,
    "f1": 0.8,
    "tp": 4,
    "fn": 2,
+   "fp": 0
+  },
+  "long_pause": {
+   "recall": 1.0,
+   "precision": 1.0,
+   "f1": 1.0,
+   "tp": 5,
+   "fn": 0,
+   "fp": 0
+  },
+  "monotone": {
+   "recall": 0.6666666666666666,
+   "precision": 1.0,
+   "f1": 0.8,
+   "tp": 4,
+   "fn": 2,
+   "fp": 0
+  },
+  "muffled": {
+   "recall": 1.0,
+   "precision": 1.0,
+   "f1": 1.0,
+   "tp": 8,
+   "fn": 0,
+   "fp": 0
+  },
+  "rushed": {
+   "recall": 0.8333333333333334,
+   "precision": 1.0,
+   "f1": 0.9090909090909091,
+   "tp": 5,
+   "fn": 1,
    "fp": 0
   },
   "volume_drop": {
@@ -106,9 +106,9 @@
   }
  },
  "boundary_mae_s": {
-  "start": 0.11307592556193746,
-  "end": 0.27283331623749646,
-  "mean_iou": 0.8982008321080613
+  "start": 0.04932000000000021,
+  "end": 0.13950333333333345,
+  "mean_iou": 0.9383827712703706
  },
  "controls": {
   "files": 2,
@@ -116,16 +116,16 @@
  },
  "flagged_words_le_40ms": {
   "all": {
-   "short": 2,
-   "total": 183
+   "short": 3,
+   "total": 204
   },
   "rate": {
-   "short": 2,
-   "total": 60
+   "short": 3,
+   "total": 76
   },
   "fp": {
    "short": 0,
-   "total": 2
+   "total": 0
   }
  },
  "score_vs_severity_spearman": {
@@ -133,7 +133,7 @@
   "long_pause": -1.0,
   "monotone": -0.9486832980505139,
   "muffled": -1.0,
-  "rushed": -0.9486832980505139,
+  "rushed": -1.0,
   "volume_drop": -1.0
  }
 }
