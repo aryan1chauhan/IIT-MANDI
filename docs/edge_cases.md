@@ -115,10 +115,9 @@ Each edge case has:
 | | |
 |---|---|
 | **Trigger** | Input audio is 8 kHz (telephone) or 48 kHz |
-| **Current behaviour** | `load_audio()` resamples to `SR=16000` via librosa. 8 kHz → no content above 4 kHz; HF share will always be very low |
-| **Risk** | 8 kHz input: `muffled` triggered on every word because HF energy is genuinely absent. This is a property of the recording, not the speaker |
-| **Status** | ⚠️ Unhandled |
-| **Suggested fix** | Check original sample rate before resampling. If < 16 kHz, disable or discount the `muffled` detector and document the limitation. |
+| **Current behaviour** | `speechlens/io.py:load_audio` probes `sf.info(str(path))` before resampling and emits a `UserWarning` when `info.samplerate < sr` (16000 Hz) warning that high-frequency clarity features may be affected (verified by `tests/test_text_and_io.py:test_load_audio_warns_on_low_sample_rate`), then resamples to `SR=16000`. |
+| **Risk** | 8 kHz input lacks content above 4 kHz, so `muffled` may still trigger if the warning is ignored (the detector itself is not auto-disabled). |
+| **Status** | ✅ **Resolved (warning implemented)** — `speechlens/io.py:load_audio` warns on `< 16 kHz`; auto-disabling `muffled` remains optional future work |
 
 ### EC-2.6 Octave-jump filter edge case (all frames removed)
 
@@ -128,6 +127,15 @@ Each edge case has:
 | **Current behaviour** | `_drop_octave_jumps` may NaN out most frames → `pitch_range` all-NaN → no pitch regions |
 | **Risk** | Degraded accuracy (misses real monotone/erratic pitch) |
 | **Status** | ⚠️ Partially handled (doesn't crash, but silently loses coverage) |
+
+### EC-2.7 Low-SNR (10 dB) creaky/sub-harmonic pitch dropout
+
+| | |
+|---|---|
+| **Trigger** | Additive noise (`10 dB` SNR, e.g. `speech1__noise_10dB`) masks quiet downward creaky pitch tails under autocorrelation (`to_pitch_ac`), collapsing `pitch_range` vs clean baseline |
+| **Current behaviour** | `speechlens/features.py:extract` switches Pass-2 F0 estimation to Praat cross-correlation (`snd.to_pitch_cc(..., silence_threshold=0.005)`), tracking the pitch tail consistently across clean and noisy audio (`0` FPs across all `18` active runs in `scripts/controls.py`). |
+| **Risk** | None at `10 dB` SNR |
+| **Status** | ✅ **Resolved** — `speechlens/features.py:extract` |
 
 ---
 
@@ -166,11 +174,10 @@ Each edge case has:
 
 | | |
 |---|---|
-| **Trigger** | Baseline has a pause ≥ 0.35 s before the first word (e.g. leading silence) and participant does not |
-| **Current behaviour** | `gap[0] = 0` always (line 97 of features.py: loop starts at `i=1`). The `missing_pause` check `(wt_b["gap"] >= 0.35) & (wt_p["gap"] < 0.1)` will never fire for `i=0`. The `long_pause` detector accesses `words_p[i - 1]["end"]` when `i=0` → `words_p[-1]["end"]` (last word!) — **wrong start time** |
-| **Risk** | **Silent wrong answer** — `long_pause` region at word 0 would have `start` = end of the last word |
-| **Status** | 🔴 **Bug** |
-| **Suggested fix** | Guard: `start = words_p[i - 1]["end"] if i > 0 else words_p[0]["start"]` in both the `long_pause` and `missing_pause` branches (lines 103 and 107 of analyze.py). Same issue exists on line 95 of `inject.py`. |
+| **Trigger** | Baseline has a pause ≥ 0.35 s before the first word (e.g. leading silence) and participant does not, or participant pauses before word 0 |
+| **Current behaviour** | `speechlens/features.py:word_table` sets `gap[0] = 0.0` (`for i in range(1, n):`). In `speechlens/analyze.py:detect_regions`, both `long_pause` and `missing_pause` explicitly guard `i > 0`: `start=words_p[i - 1]["end"] if i > 0 else words_p[i]["start"]` (and identically for `words_b`), preventing `words[-1]` index wrap-around. |
+| **Risk** | None — wrap-around bug fixed |
+| **Status** | ✅ **Resolved** — `speechlens/analyze.py:detect_regions` |
 
 ### EC-3.5 All deltas are identical (MAD = 0)
 
@@ -194,11 +201,10 @@ Each edge case has:
 
 | | |
 |---|---|
-| **Trigger** | `words_p[-1]["end"] - words_p[0]["start"]` ≈ 0 (all words collapsed) |
-| **Current behaviour** | `T ≈ 0` → `(r["end"] - r["start"]) / T` → division by zero / inf → `exp(-15 * inf) = 0` → scores collapse to 0 |
-| **Risk** | Crash or nonsensical score |
-| **Status** | ⚠️ Unhandled |
-| **Suggested fix** | `T = max(T, 0.1)` or reject the analysis if `T < 1.0`. |
+| **Trigger** | `words_p[-1]["end"] - words_p[0]["start"]` or `words_b[-1]["end"] - words_b[0]["start"]` ≈ 0 (all words collapsed) |
+| **Current behaviour** | `speechlens/analyze.py:score` clamps `ref_duration = max(ref_duration, 0.1)`, and `speechlens/analyze.py:analyze` clamps `T = max(..., 0.1)` and `ref_duration = max(..., 0.1)` before calling `score()`. |
+| **Risk** | None (guarded against division by zero) |
+| **Status** | ✅ **Resolved** — `speechlens/analyze.py:score`, `speechlens/analyze.py:analyze` |
 
 ---
 
@@ -208,11 +214,10 @@ Each edge case has:
 
 | | |
 |---|---|
-| **Trigger** | `choose_boundary()` returns `i=0` (margin not respected, or margin overridden) |
-| **Current behaviour** | `apply_flaw` → `words[i - 1]["end"]` → `words[-1]["end"]` (wraps to last word). Insertion point `b` is near the end of the file |
-| **Risk** | **Silent wrong answer** — silence inserted at the wrong location, ground-truth region is wrong |
-| **Status** | 🔴 **Bug** (same pattern as EC-3.4) |
-| **Suggested fix** | `choose_boundary` has `margin=4`, which prevents `i=0` in practice. But `apply_flaw` should still guard `i > 0`. |
+| **Trigger** | `choose_boundary()` returns `i=0` or caller passes `i=0` directly |
+| **Current behaviour** | `speechlens/inject.py:apply_flaw` explicitly checks `if i < 1: raise ValueError("Cannot insert long_pause before the first word (i=0)")`, and `speechlens/inject.py:choose_boundary` uses `margin=4`. |
+| **Risk** | Crash (expected fail-fast guard) |
+| **Status** | ✅ **Resolved** — `speechlens/inject.py:apply_flaw` |
 
 ### EC-4.2 Overlapping flaw spans in a multi-flaw plan
 
@@ -233,25 +238,24 @@ Each edge case has:
 | **Risk** | **Silent wrong answer** — label says `monotone` was injected but audio is unchanged. Eval will count it as a false negative |
 | **Status** | ⚠️ Partially handled (no crash, but label is wrong) |
 
-### EC-4.4 `time_stretch` produces empty array
+### EC-4.4 Time-stretch empty or ultra-short segment
 
 | | |
 |---|---|
-| **Trigger** | Very short segment (< 1 frame) stretched by a large factor |
-| **Current behaviour** | `librosa.effects.time_stretch` may return a 0-length array → `_fade` division, `np.concatenate` produces misaligned audio |
-| **Risk** | Crash or corrupted audio |
-| **Status** | ⚠️ Unhandled |
-| **Suggested fix** | Guard: if `len(seg) < WIN`, skip injection and return original segment. |
+| **Trigger** | Empty or sub-frame word span `[i, j]` passed to `rushed`/`dragging` (`ffmpeg` `atempo`) |
+| **Current behaviour** | `speechlens/inject.py:apply_flaw` raises `ValueError` on `len(seg) == 0`, and `speechlens/inject.py:_atempo` validates `0.5 <= rate <= 2.0` and raises `RuntimeError` if `len(out) == 0`. No minimum `WIN` sample guard exists before invoking `ffmpeg`. |
+| **Risk** | Crash on degenerate ultra-short spans (fails fast instead of silent misalignment) |
+| **Status** | ⚠️ Partially handled (`apply_flaw` + `_atempo` fail fast; minimum `WIN` guard not added) |
+| **Suggested fix** | Guard: if `len(seg) < WIN`, skip or raise explicitly before invoking `ffmpeg`. |
 
 ### EC-4.5 Severity value out of range
 
 | | |
 |---|---|
 | **Trigger** | `severity=0` or `severity=5` passed to `apply_flaw` |
-| **Current behaviour** | `SEVERITY[flaw][severity - 1]` → index `-1` (last element) or index `4` (`IndexError`) |
-| **Risk** | Crash or silent wrong answer (severity 0 maps to severity 4) |
-| **Status** | ⚠️ Unhandled |
-| **Suggested fix** | Validate `1 <= severity <= 4` at the top of `apply_flaw`. |
+| **Current behaviour** | `speechlens/inject.py:apply_flaw` validates `if not (1 <= severity <= 4): raise ValueError(f"severity must be 1-4, got {severity}")` before indexing `SEVERITY[flaw]`. |
+| **Risk** | Crash (expected fail-fast guard) |
+| **Status** | ✅ **Resolved** — `speechlens/inject.py:apply_flaw` |
 
 ---
 
@@ -271,9 +275,9 @@ Each edge case has:
 | | |
 |---|---|
 | **Trigger** | Clean file has 0 predicted regions; a file where all flaws are severity 1 (below detection threshold) |
-| **Current behaviour** | `match()` returns `([], [], list(range(len(truth))))`. Precision = 0/0 undefined; recall = 0 |
-| **Risk** | Division by zero in `run_eval.py` when computing precision/recall |
-| **Status** | ⚠️ Partially handled (depends on how `run_eval.py` computes the metric — needs a `tp / max(tp + fp, 1)` guard) |
+| **Current behaviour** | `match()` returns `([], [], list(range(len(truth))))`. Both `scripts/run_eval.py:main` and `scripts/eval_real.py:run_real_eval` guard precision/recall/F1 denominators with `max(..., 1)` and `max(..., 1e-9)` (and return `recall=None` when no ground truth exists for a class). |
+| **Risk** | None (division-by-zero guarded) |
+| **Status** | ✅ **Resolved** — `scripts/run_eval.py:main`, `scripts/eval_real.py:run_real_eval` |
 
 ### EC-5.3 Type mismatch: injected `rushed` detected as `dragging`
 
@@ -316,6 +320,15 @@ Each edge case has:
 | **Risk** | None |
 | **Status** | ✅ Handled |
 
+### EC-6.4 Broad exception swallow around sample-rate probe
+
+| | |
+|---|---|
+| **Trigger** | Unexpected non-I/O error inside `sf.info()` probe in `load_audio` |
+| **Current behaviour** | `speechlens/io.py:load_audio` narrows the probe fallback catch to `except (OSError, RuntimeError): pass`, avoiding masking programming/logic errors while allowing unsupported container probes to fall through to `librosa.load`. |
+| **Risk** | None |
+| **Status** | ✅ **Resolved** — `speechlens/io.py:load_audio` |
+
 ---
 
 ## 7. Text Utilities — `text.py`
@@ -324,11 +337,10 @@ Each edge case has:
 
 | | |
 |---|---|
-| **Trigger** | "We scored 100 points in the NBA finals" |
-| **Current behaviour** | `normalize_words()` strips `100` and `NBA` entirely (only keeps `a-z` + `'`) → word count drops → alignment mismatch if the speaker says those words |
-| **Risk** | **Silent wrong answer** — alignment breaks or `analyze()` raises `ValueError` due to word count mismatch |
-| **Status** | ⚠️ Unhandled |
-| **Suggested fix** | Either (a) expand numbers to words (`100` → `one hundred`) before normalisation, or (b) document that transcripts must be pre-normalised with numbers spelled out. |
+| **Trigger** | `"We scored 100 points in the NBA finals"` |
+| **Current behaviour** | `speechlens/text.py:normalize_words` runs `re.findall(r"\d+", text)` and fails fast with `ValueError` instructing that numbers must be spelled out (verified by `tests/test_text_and_io.py:test_normalize_words_rejects_numeric_digits`). Alphabetic abbreviations (e.g. `"NBA"`) are lowercased (`"nba"`) and retained by `[a-z']+`. |
+| **Risk** | Crash on unexpanded digits (expected fail-fast guard); spoken letter-by-letter acronyms remain dependent on `MMS_FA` lexicon alignment |
+| **Status** | ✅ **Resolved (digit validation)** — `speechlens/text.py:normalize_words` |
 
 ### EC-7.2 Apostrophes and contractions
 
@@ -343,11 +355,10 @@ Each edge case has:
 
 | | |
 |---|---|
-| **Trigger** | Text pasted from Word/Google Docs: `"don't"` (U+2019 right single quotation mark) |
-| **Current behaviour** | `normalize_words()` regex `[a-z']` only matches ASCII apostrophe `'` (U+0027). The curly `'` is stripped → `"dont"` → MMS_FA may or may not align it |
-| **Risk** | Degraded accuracy |
-| **Status** | ⚠️ Unhandled |
-| **Suggested fix** | Normalise `'`, `'`, `` ` `` → `'` before the regex filter. |
+| **Trigger** | Text pasted from Word/Google Docs: `"It’s wonderful, don‘t you think? \`SpeechLens\` is live."` |
+| **Current behaviour** | `speechlens/text.py:normalize_words` replaces `\u2019`, `\u2018`, and `` ` `` with ASCII `'`, extracts `[a-z']+` tokens, and strips boundary quotes (`t.strip("'")`) while preserving internal contractions (verified by `tests/test_text_and_io.py:test_normalize_words_handles_smart_quotes`). |
+| **Risk** | None |
+| **Status** | ✅ **Resolved** — `speechlens/text.py:normalize_words` |
 
 ---
 
@@ -453,20 +464,44 @@ Each edge case has:
 
 ---
 
+## 11. Web Server & Upload Handling — `viz/server.py`
+
+### EC-11.1 Invalid transcript digits or word-count mismatch on `POST /api/analyze`
+
+| | |
+|---|---|
+| **Trigger** | Client submits digits/empty transcript (`normalize_words()` `ValueError`) or alignments whose word counts differ (`analyze()` `ValueError`) |
+| **Current behaviour** | `viz/server.py:SpeechLensHandler.handle_analyze` catches `ValueError` separately and responds with HTTP `400` JSON `{"error": str(err)}` instead of HTTP `500` (verified by `tests/test_pipeline.py:test_server_returns_400_on_value_error_and_413_on_oversized_upload`). |
+| **Risk** | None |
+| **Status** | ✅ **Resolved** — `viz/server.py:handle_analyze` |
+
+### EC-11.2 Oversized upload or stale `%TEMP%` WAV accumulation
+
+| | |
+|---|---|
+| **Trigger** | Large base64 upload on `POST /api/analyze` or repeated interactive uploads leaving `tmp_*_*.wav` files in `%TEMP%` |
+| **Current behaviour** | `viz/server.py:SpeechLensHandler.handle_analyze` enforces `MAX_UPLOAD_BYTES = 25 * 1024 * 1024` (returning HTTP `413` JSON before reading `rfile`) and prunes `tmp_*_*.wav` files older than `1800` s via `_cleanup_old_tmp_wavs()`. |
+| **Risk** | None |
+| **Status** | ✅ **Resolved** — `viz/server.py:handle_analyze`, `viz/server.py:_cleanup_old_tmp_wavs` |
+
+---
+
 ## Summary
 
-| Risk level | Count | IDs |
+| Risk level / Status | Count | IDs |
 |---|---|---|
-| 🔴 **Bug** (produces wrong results today) | 2 | EC-3.4, EC-4.1 |
-| ⚠️ **Silent wrong answer** | 5 | EC-1.2, EC-2.1, EC-4.2, EC-4.3, EC-8.3 |
-| ⚠️ **Degraded accuracy** | 8 | EC-1.4, EC-2.3, EC-2.4, EC-2.5, EC-2.6, EC-3.2, EC-3.3, EC-3.6 |
-| ⚠️ **Crash (unhandled)** | 5 | EC-1.3, EC-4.4, EC-4.5, EC-6.1, EC-6.2 |
-| ✅ **Handled** | 10 | EC-1.1, EC-3.1, EC-3.5, EC-5.1, EC-6.3, EC-7.2, EC-9.1, EC-9.2, EC-10.1, EC-10.3 |
+| 🔴 **Bug** (known unfixed wrong results) | 0 | — |
+| ⚠️ **Silent wrong answer (open / partial)** | 5 | EC-1.2, EC-2.1, EC-4.2, EC-4.3, EC-8.3 |
+| ⚠️ **Degraded accuracy / cosmetic (open / partial)** | 12 | EC-1.4, EC-1.5, EC-2.2, EC-2.3, EC-2.4, EC-2.6, EC-3.2, EC-3.3, EC-3.6, EC-5.3, EC-8.1, EC-9.3 |
+| ⚠️ **Crash (unhandled / partial)** | 7 | EC-1.3, EC-4.4, EC-6.1, EC-6.2, EC-8.2, EC-10.2, EC-10.4 |
+| ✅ **Handled / Resolved** | 22 | EC-1.1, EC-2.5, EC-2.7, EC-3.1, EC-3.4, EC-3.5, EC-3.7, EC-4.1, EC-4.5, EC-5.1, EC-5.2, EC-6.3, EC-6.4, EC-7.1, EC-7.2, EC-7.3, EC-9.1, EC-9.2, EC-10.1, EC-10.3, EC-11.1, EC-11.2 |
 
-### Priority fixes before submission
+### Remaining Open Priorities (audited against current code)
 
-1. **EC-3.4 / EC-4.1** — `words[i - 1]` wrap-around bug at index 0. Quick one-line guard.
-2. **EC-4.5** — Severity validation. One-line assertion.
-3. **EC-7.1 / EC-7.3** — Text normalisation losing numbers and smart quotes. Moderate effort.
-4. **EC-2.5** — 8 kHz input false-triggers `muffled`. Check original sample rate.
-5. **EC-3.7** — Division by ≈ 0 in `score()`. One-line `max(T, 0.1)`.
+1. **EC-1.2 / EC-1.3 / EC-8.3** — Validate transcript–audio match (word confidence/duration sanity), reject silent/no-speech recordings early, and verify word-text alignment equality in `analyze()`.
+2. **EC-4.2** — Validate disjoint `[i, j]` spans inside `speechlens/inject.py:make_flawed`.
+3. **EC-2.3 / EC-2.4** — Clipping and background-music warnings in `speechlens/features.py:extract`.
+4. **EC-3.2 / EC-3.6** — Exclude `< 10 ms` collapsed words from rate deltas and handle unvoiced/whispered passages explicitly in `speechlens/analyze.py:detect_regions`.
+5. **EC-6.1 / EC-6.2** — Surface friendly decoder errors in `speechlens/io.py:load_audio`.
+
+*Resolved items previously listed here (now implemented and verified): EC-2.5 & EC-6.4 (`speechlens/io.py:load_audio`), EC-2.7 (`speechlens/features.py:extract`), EC-3.4 (`speechlens/analyze.py:detect_regions`), EC-3.7 (`speechlens/analyze.py:score`, `analyze`), EC-4.1 & EC-4.5 (`speechlens/inject.py:apply_flaw`), EC-5.2 (`scripts/run_eval.py:main`, `scripts/eval_real.py:run_real_eval`), EC-7.1 & EC-7.3 (`speechlens/text.py:normalize_words`), EC-11.1 & EC-11.2 (`viz/server.py:handle_analyze`).*

@@ -1,27 +1,27 @@
 {
   "projectId": "proj_speechlens_local",
   "type": "frontend",
-  "name": "User uploads audio and receives speech analysis metrics",
+  "name": "User selects preset audio and receives DAW speech analysis metrics",
   "planSteps": [
     {
       "type": "action",
-      "description": "Open http://localhost:3000/ and verify the SpeechLens analysis interface is visible"
+      "description": "Open http://localhost:3000/ and verify the SpeechLens Studio header (#presetSelect Evaluation Take dropdown and #btnRunAnalysis 'Analyze Speech Take' button) is visible"
     },
     {
       "type": "action",
-      "description": "Select the 'Synthetic: Rushed Delivery (Severity 4)' preset from the dropdown and click 'Load Preset'"
+      "description": "Select 'Synthetic: Rushed Delivery (Severity 4)' from the #presetSelect ('Evaluation Take:') dropdown and verify #participantFileDisplay, #baselineFileDisplay, and #transcriptInput auto-populate"
     },
     {
       "type": "action",
-      "description": "Click the 'Run Analysis' button"
+      "description": "Click the 'Analyze Speech Take' button (#btnRunAnalysis)"
     },
     {
       "type": "assertion",
-      "description": "Verify that scoreOverall displays '79.4' and scorePace displays '65.7'"
+      "description": "Verify #masterScoreVal displays '79', #scoreBadge displays 'Localized Anomaly Flagged', #valPace displays '65.7', and #valPausing, #valPitch, #valVolume, and #valClarity each display '100.0'"
     },
     {
       "type": "assertion",
-      "description": "Verify that the time-series canvas and grounded flaw region cards are displayed"
+      "description": "Verify #studioWorkspace is visible with multi-track canvases (#canvasCh1, #canvasCh2, #canvasRuler, #canvasMinimap), #dialogueWords tokens, #flawCountIndicator showing '1 Flagged', and clicking the 'rushed' entry in #flawsListContainer opens #flawDetailView"
     }
   ]
 }
