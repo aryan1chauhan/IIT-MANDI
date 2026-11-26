@@ -13,7 +13,8 @@ def convert_to_mp3(input_path):
     cmd = ['ffmpeg', '-y', '-i', input_path, '-vn', '-ar', '44100', '-ac', '2', '-b:a', '192k', out_path]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
+        Path(out_path).unlink(missing_ok=True)
         print(f"Error running ffmpeg on {input_path}")
         sys.exit(1)
     
@@ -156,20 +157,26 @@ def make_html(report_data, part_b64, base_b64):
             
             card.innerHTML = `
                 <div class="region-header">
-                    <span class="region-type">${r.type}</span>
+                    <span class="region-type"></span>
                     <span class="region-times">${r.start.toFixed(2)}s &mdash; ${r.end.toFixed(2)}s</span>
                 </div>
-                <div class="region-text">"${r.text}"</div>
+                <div class="region-text"></div>
                 <div class="region-stats">
-                    <div>Observed: <span>${observedVal} ${unit}</span></div>
-                    <div>Reference: <span>${refVal} ${unit}</span></div>
+                    <div>Observed: <span></span></div>
+                    <div>Reference: <span></span></div>
                 </div>
-                <div class="region-explanation">${r.explanation}</div>
+                <div class="region-explanation"></div>
                 <div class="btn-group">
                     <button class="play-btn" onclick="playSpan('participant', ${r.start}, ${r.end})">Play Yours</button>
                     <button class="play-base-btn" onclick="playSpan('baseline', ${r.base_start}, ${r.base_end})">Play Reference</button>
                 </div>
             `;
+            card.querySelector('.region-type').textContent = r.type;
+            card.querySelector('.region-text').textContent = `"${r.text}"`;
+            const statSpans = card.querySelectorAll('.region-stats span');
+            statSpans[0].textContent = `${observedVal} ${unit}`;
+            statSpans[1].textContent = `${refVal} ${unit}`;
+            card.querySelector('.region-explanation').textContent = r.explanation;
             regionsList.appendChild(card);
         });
     }
@@ -308,7 +315,7 @@ def make_html(report_data, part_b64, base_b64):
 </html>
 """
     
-    html = html_template.replace("{{REPORT_JSON}}", json.dumps(report_data))
+    html = html_template.replace("{{REPORT_JSON}}", json.dumps(report_data).replace("</", "<\\/"))
     html = html.replace("{{PART_B64}}", part_b64)
     html = html.replace("{{BASE_B64}}", base_b64)
     return html
@@ -324,14 +331,19 @@ def main():
     with open(args.report_json, "r") as f:
         report_data = json.load(f)
         
-    part_mp3 = convert_to_mp3(args.participant)
-    base_mp3 = convert_to_mp3(args.baseline)
-    
-    part_b64 = file_to_base64(part_mp3)
-    base_b64 = file_to_base64(base_mp3)
-    
-    Path(part_mp3).unlink()
-    Path(base_mp3).unlink()
+    part_mp3 = None
+    base_mp3 = None
+    try:
+        part_mp3 = convert_to_mp3(args.participant)
+        base_mp3 = convert_to_mp3(args.baseline)
+
+        part_b64 = file_to_base64(part_mp3)
+        base_b64 = file_to_base64(base_mp3)
+    finally:
+        if part_mp3:
+            Path(part_mp3).unlink(missing_ok=True)
+        if base_mp3:
+            Path(base_mp3).unlink(missing_ok=True)
     
     html = make_html(report_data, part_b64, base_b64)
     

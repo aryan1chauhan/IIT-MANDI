@@ -12,6 +12,7 @@ import json
 import os
 import sys
 import tempfile
+import time
 import urllib.parse
 from pathlib import Path
 
@@ -23,6 +24,18 @@ from speechlens.io import load_audio
 from speechlens.text import load_alignment, normalize_words, save_alignment
 
 PORT = 3000
+MAX_UPLOAD_BYTES = 25 * 1024 * 1024
+TMP_MAX_AGE_S = 1800
+
+
+def _cleanup_old_tmp_wavs(tmp_dir: Path, max_age_s: int = TMP_MAX_AGE_S):
+    cutoff = time.time() - max_age_s
+    for p in tmp_dir.glob("tmp_*_*.wav"):
+        try:
+            if p.stat().st_mtime < cutoff:
+                p.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 PRESETS = {
     "real01_rushed": {
@@ -69,16 +82,6 @@ PRESETS = {
 
 
 class SpeechLensHandler(http.server.SimpleHTTPRequestHandler):
-    def end_headers(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        super().end_headers()
-
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.end_headers()
-
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
@@ -92,8 +95,9 @@ class SpeechLensHandler(http.server.SimpleHTTPRequestHandler):
         elif path == "/health":
             self.send_json({"status": "ok", "app": "SpeechLens", "version": "1.0.0"})
         elif path.startswith("/samples/"):
-            sample_file = ROOT / "samples" / path[9:]
-            if sample_file.exists():
+            samples_dir = (ROOT / "samples").resolve()
+            sample_file = (samples_dir / path[9:]).resolve()
+            if sample_file.is_relative_to(samples_dir) and sample_file.exists():
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.end_headers()
@@ -141,8 +145,9 @@ class SpeechLensHandler(http.server.SimpleHTTPRequestHandler):
             if pid in PRESETS:
                 target_path = PRESETS[pid]["participant"] if role == "part" else PRESETS[pid]["baseline"]
         elif audio_id.startswith("tmp_"):
-            cand = Path(tempfile.gettempdir()) / f"{audio_id}.wav"
-            if cand.exists():
+            tmp_dir = Path(tempfile.gettempdir()).resolve()
+            cand = (tmp_dir / f"{audio_id}.wav").resolve()
+            if cand.is_relative_to(tmp_dir) and cand.exists():
                 target_path = cand
 
         if target_path and target_path.exists():
@@ -158,7 +163,17 @@ class SpeechLensHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(404, f"Audio file not found for: {audio_id}")
 
     def handle_analyze(self):
-        content_len = int(self.headers.get("Content-Length", 0))
+        try:
+            content_len = int(self.headers.get("Content-Length", 0))
+        except ValueError:
+            self.send_json({"error": "Invalid Content-Length header"}, status=400)
+            return
+        if content_len < 0:
+            self.send_json({"error": "Invalid Content-Length header"}, status=400)
+            return
+        if content_len > MAX_UPLOAD_BYTES:
+            self.send_json({"error": f"Request payload exceeds {MAX_UPLOAD_BYTES} bytes limit"}, status=413)
+            return
         raw_body = self.rfile.read(content_len)
         try:
             req = json.loads(raw_body.decode("utf-8"))
@@ -201,11 +216,13 @@ class SpeechLensHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_json({"error": "Missing participant_b64, baseline_b64, or transcript"}, status=400)
                     return
 
-                # Save temp audio files
+                # Save temp audio files after pruning stale session WAVs
                 import uuid
+                tmp_dir = Path(tempfile.gettempdir())
+                _cleanup_old_tmp_wavs(tmp_dir)
                 uid = uuid.uuid4().hex[:8]
-                p_tmp = Path(tempfile.gettempdir()) / f"tmp_{uid}_part.wav"
-                b_tmp = Path(tempfile.gettempdir()) / f"tmp_{uid}_base.wav"
+                p_tmp = tmp_dir / f"tmp_{uid}_part.wav"
+                b_tmp = tmp_dir / f"tmp_{uid}_base.wav"
                 p_tmp.write_bytes(base64.b64decode(p_b64.split(",")[-1]))
                 b_tmp.write_bytes(base64.b64decode(b_b64.split(",")[-1]))
 
@@ -224,6 +241,8 @@ class SpeechLensHandler(http.server.SimpleHTTPRequestHandler):
                 "baseline_url": base_audio_url,
             }
             self.send_json(res)
+        except ValueError as err:
+            self.send_json({"error": str(err)}, status=400)
         except Exception as err:
             self.send_json({"error": str(err)}, status=500)
 
@@ -237,7 +256,7 @@ class SpeechLensHandler(http.server.SimpleHTTPRequestHandler):
 
 
 def run_server(port=PORT):
-    server_address = ("", port)
+    server_address = ("127.0.0.1", port)
     httpd = http.server.ThreadingHTTPServer(server_address, SpeechLensHandler)
     print(f"SpeechLens Dashboard running at: http://localhost:{port}/", flush=True)
     try:

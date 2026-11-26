@@ -1266,7 +1266,7 @@
             renderStudioDashboard(res);
         } catch (err) {
             banner.className = 'status-banner error';
-            banner.innerHTML = '<span>Execution Error: ' + err.message + '</span>';
+            banner.textContent = 'Execution Error: ' + err.message;
         } finally {
             btn.disabled = false;
         }
